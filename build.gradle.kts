@@ -22,7 +22,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:1.4.0")
     implementation("io.ktor:ktor-html-builder:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
-    implementation("com.h2database:h2:1.3.148")
+    implementation("com.h2database:h2:1.4.200")
+//    implementation("log4j:log4j:1.2.17")
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"

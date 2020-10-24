@@ -9,16 +9,15 @@ import java.util.*
 internal object ConnectionDB {
     private val username = "sa"
     private val password = ""
-    private lateinit var conn: Connection
+    lateinit var conn: Connection
+    private val path:String = "jdbc:h2:".plus(System.getProperty("user.dir")).plus("\\db\\db")
+
 
 
     init {
-        val connectionProps = Properties()
-        connectionProps.put("user", username)
-        connectionProps.put("password", password)
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance()
-            conn = DriverManager.getConnection("jdbc:h2:D:\\GitHub\\simple-kotlin-app\\db\\db", connectionProps)
+            Class.forName("org.h2.Driver");
+            conn = DriverManager.getConnection(path, username, password)
 
         } catch (ex: SQLException) {
             // handle any errors
@@ -29,5 +28,5 @@ internal object ConnectionDB {
         }
     }
 
-   fun getConnection():Connection = this.conn
+
 }
