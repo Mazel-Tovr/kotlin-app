@@ -2,12 +2,12 @@ package com.epam.kotlinapp.dao
 
 import com.epam.kotlinapp.model.User
 
-object UserOperation : ICommonOperations<User> {
+object UserOperations : ICommonOperations<User> {
 //    val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun create(entity: User) {
         val prepareStatement = ConnectionDB.conn
-            .prepareStatement("INSERT INTO USER VALUES ('null',?,?,?)")
+            .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?)")
         prepareStatement.setString(1,entity.name)
         prepareStatement.setString(2,entity.email)
         prepareStatement.setString(3,entity.password)

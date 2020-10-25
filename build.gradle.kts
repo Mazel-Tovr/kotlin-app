@@ -11,6 +11,9 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
+        url = uri("https://jitpack.io")
+    }
+    maven {
         url = uri("https://dl.bintray.com/kotlin/ktor")
     }
     maven {
@@ -18,12 +21,17 @@ repositories {
     }
 }
 dependencies {
+    val ktorVersion: String = "1.4.0"
+    val h2Version: String = "1.4.200"
+    val loggerVersion: String = "1.7.30"
     testImplementation(kotlin("test-junit"))
-    implementation("io.ktor:ktor-server-netty:1.4.0")
-    implementation("io.ktor:ktor-html-builder:1.4.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
-    implementation("com.h2database:h2:1.4.200")
-//    implementation("log4j:log4j:1.2.17")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-html-builder:$ktorVersion")
+    //implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2") //I don't think i need this
+    implementation("com.h2database:h2:$h2Version")
+    implementation("io.ktor:ktor-gson:$ktorVersion")
+    implementation("org.slf4j:slf4j-simple:$loggerVersion")
+    implementation("com.github.papsign:Ktor-OpenAPI-Generator:-SNAPSHOT")
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"

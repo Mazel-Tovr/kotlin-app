@@ -2,11 +2,11 @@ package com.epam.kotlinapp.dao
 
 import com.epam.kotlinapp.model.Product
 
-object ProductOperation : ICommonOperations<Product> {
+object ProductOperations : ICommonOperations<Product> {
 
     override fun create(entity: Product) {
         val prepareStatement = ConnectionDB.conn
-            .prepareStatement("INSERT INTO USER VALUES ('null',?,?,?,?,?)")
+            .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?,?,?)")
         prepareStatement.setString(1, entity.productName)
         prepareStatement.setInt(2, entity.price)
         prepareStatement.setString(3, entity.description)

@@ -6,7 +6,7 @@ object ProductGroupOperations : ICommonOperations<ProductGroup> {
 
     override fun create(entity: ProductGroup) {
         val prepareStatement = ConnectionDB.conn
-            .prepareStatement("INSERT INTO PRODUCT_GROUP VALUES ('null',?)")
+            .prepareStatement("INSERT INTO PRODUCT_GROUP VALUES (NULL,?)")
         prepareStatement.setString(1, entity.groupName)
         prepareStatement.executeUpdate()
 

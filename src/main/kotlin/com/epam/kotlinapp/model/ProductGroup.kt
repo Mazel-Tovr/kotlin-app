@@ -1,3 +1,9 @@
 package com.epam.kotlinapp.model
 
-data class ProductGroup(var id:Long?,var groupName:String)
+import com.papsign.ktor.openapigen.annotations.Response
+
+@Response("ProductGroup")
+data class ProductGroup(
+    var id: Long?,
+    var groupName: String
+) : Entity()
