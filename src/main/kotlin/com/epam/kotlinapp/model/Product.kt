@@ -1,8 +1,6 @@
 package com.epam.kotlinapp.model
 
-import com.papsign.ktor.openapigen.annotations.Response
 
-@Response("Product")
 data class Product(
     var id: Long?,
     var productName: String,

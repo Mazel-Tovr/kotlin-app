@@ -31,7 +31,8 @@ dependencies {
     implementation("com.h2database:h2:$h2Version")
     implementation("io.ktor:ktor-gson:$ktorVersion")
     implementation("org.slf4j:slf4j-simple:$loggerVersion")
-    implementation("com.github.papsign:Ktor-OpenAPI-Generator:-SNAPSHOT")
+    //implementation("com.github.papsign:Ktor-OpenAPI-Generator:-SNAPSHOT")
+    implementation("com.github.nielsfalk:ktor-swagger:v0.7.0")
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"

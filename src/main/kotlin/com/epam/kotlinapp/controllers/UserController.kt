@@ -2,17 +2,10 @@ package com.epam.kotlinapp.controllers
 
 import com.epam.kotlinapp.business.ICommonServices
 import com.epam.kotlinapp.model.User
-import com.papsign.ktor.openapigen.annotations.Path
-import com.papsign.ktor.openapigen.annotations.parameters.PathParam
 import io.ktor.application.*
-import io.ktor.http.content.*
-
 import io.ktor.request.*
 import io.ktor.response.*
-import com.papsign.ktor.openapigen.route.*
 import io.ktor.routing.*
-import java.lang.Exception
-import kotlin.text.get
 
 //Test input
 //{
