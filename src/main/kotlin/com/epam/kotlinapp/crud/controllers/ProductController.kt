@@ -1,9 +1,9 @@
-package com.epam.kotlinapp.controllers
+package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
-import com.epam.kotlinapp.business.ICommonServices
-import com.epam.kotlinapp.model.Product
-import com.epam.kotlinapp.model.User
+import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.model.Product
+import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
@@ -12,7 +12,6 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.routing.post
 import java.lang.Exception
 
 private const val path: String = "/product"
@@ -34,7 +33,7 @@ private class product(val id: Long)
 @Location(path)
 private class products
 
-@Group("Generic")
+@Group("Product operations")
 @Location(path.plus("/all"))
 private class productGeneric
 

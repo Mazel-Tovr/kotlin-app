@@ -1,4 +1,4 @@
-package com.epam.kotlinapp.exceptions
+package com.epam.kotlinapp.crud.exceptions
 
 import java.lang.Exception
 

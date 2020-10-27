@@ -1,10 +1,10 @@
-package com.epam.kotlinapp.business
+package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.dao.ICommonOperations
-import com.epam.kotlinapp.dao.ProductGroupOperations
-import com.epam.kotlinapp.exceptions.DataException
-import com.epam.kotlinapp.exceptions.ProductGroupNotFoundException
-import com.epam.kotlinapp.model.ProductGroup
+import com.epam.kotlinapp.crud.dao.ICommonOperations
+import com.epam.kotlinapp.crud.dao.ProductGroupOperations
+import com.epam.kotlinapp.crud.exceptions.DataException
+import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
+import com.epam.kotlinapp.crud.model.ProductGroup
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.SQLException

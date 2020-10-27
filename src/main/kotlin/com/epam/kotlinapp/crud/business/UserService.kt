@@ -1,9 +1,9 @@
-package com.epam.kotlinapp.business
+package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.dao.ICommonOperations
-import com.epam.kotlinapp.dao.UserOperations
-import com.epam.kotlinapp.exceptions.UserNotFoundException
-import com.epam.kotlinapp.model.User
+import com.epam.kotlinapp.crud.dao.ICommonOperations
+import com.epam.kotlinapp.crud.dao.UserOperations
+import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
+import com.epam.kotlinapp.crud.model.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.SQLException

@@ -1,6 +1,6 @@
-package com.epam.kotlinapp.dao
+package com.epam.kotlinapp.crud.dao
 
-import com.epam.kotlinapp.model.Entity
+import com.epam.kotlinapp.crud.model.Entity
 
 interface ICommonOperations<T : Entity> {
     fun create(entity: T)

@@ -1,6 +1,6 @@
-package com.epam.kotlinapp.dao
+package com.epam.kotlinapp.crud.dao
 
-import com.epam.kotlinapp.model.ProductGroup
+import com.epam.kotlinapp.crud.model.ProductGroup
 
 object ProductGroupOperations : ICommonOperations<ProductGroup> {
 

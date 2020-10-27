@@ -1,4 +1,4 @@
-package com.epam.kotlinapp.model
+package com.epam.kotlinapp.crud.model
 
 
 data class User(

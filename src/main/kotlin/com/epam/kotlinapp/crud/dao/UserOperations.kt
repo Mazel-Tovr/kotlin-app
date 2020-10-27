@@ -1,6 +1,6 @@
-package com.epam.kotlinapp.dao
+package com.epam.kotlinapp.crud.dao
 
-import com.epam.kotlinapp.model.User
+import com.epam.kotlinapp.crud.model.User
 
 object UserOperations : ICommonOperations<User> {
 //    val logger: Logger = LoggerFactory.getLogger(javaClass)

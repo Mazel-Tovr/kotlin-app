@@ -1,9 +1,9 @@
-package com.epam.kotlinapp.controllers
+package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
-import com.epam.kotlinapp.business.ICommonServices
-import com.epam.kotlinapp.model.ProductGroup
-import com.epam.kotlinapp.model.User
+import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.model.ProductGroup
+import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
@@ -30,7 +30,7 @@ private class productGroup(val id: Long)
 @Location(path)
 private class productGroups
 
-@Group("Generic")
+@Group("Product group operations")
 @Location(path.plus("/all"))
 private class productGroupGeneric
 

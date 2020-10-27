@@ -1,6 +1,6 @@
-package com.epam.kotlinapp.business
+package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.model.Entity
+import com.epam.kotlinapp.crud.model.Entity
 
 interface ICommonServices<T : Entity> {
     fun create(entity: T)
