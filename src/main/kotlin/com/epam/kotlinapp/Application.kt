@@ -1,7 +1,7 @@
 package com.epam.kotlinapp
 
 import com.epam.kotlinapp.chat.server.Server
-import com.epam.kotlinapp.chat.server.User
+import com.epam.kotlinapp.chat.server.webSocket
 import com.epam.kotlinapp.crud.business.ProductGroupService
 import com.epam.kotlinapp.crud.business.ProductService
 import com.epam.kotlinapp.crud.business.UserService
@@ -28,7 +28,7 @@ import java.time.Duration
 data class Model<T>(val elements: MutableList<T>)
 
 
-fun main() {
+fun main(args:Array<String>) {
     val server = Server()
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
         install(DefaultHeaders)
@@ -68,32 +68,7 @@ fun main() {
             this.userController(UserService)
             this.productController(ProductService)
             this.productGroupController(ProductGroupService)
-
-            webSocket("/ws") {
-
-                val input = incoming.receive()
-
-                val userName = if (input is Frame.Text) input.readText() else ""
-
-                if (userName != "" && server.isNickNameFree(userName)) {
-                    val user = User(userName)
-                    server.joinToServer(user, this)
-                    try {
-                        while (true) {
-                            when (val frame = incoming.receive()) {
-                                is Frame.Text -> {
-                                    server.sendMessage(user, frame.readText())
-                                }
-                            }
-                        }
-
-                    } finally {
-                        server.userLeftServer(user, this)
-                    }
-                } else {
-                    this.send(Frame.Text("This nick name is already taken try again"))
-                }
-            }
+            this.webSocket(server)
 
         }
     }.start(wait = true)

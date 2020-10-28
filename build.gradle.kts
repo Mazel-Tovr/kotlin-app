@@ -2,10 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.10"
-    application
+    id("application")
 }
 group = "com.epam"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClassName = "com.epam.kotlinapp.ApplicationKt"
+}
 
 repositories {
     mavenCentral()
@@ -35,10 +39,8 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     //implementation("com.github.papsign:Ktor-OpenAPI-Generator:-SNAPSHOT")
     implementation("com.github.nielsfalk:ktor-swagger:v0.7.0")
+    implementation("junit:junit:4.4")
 }
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "1.8"
-}
-application {
-    mainClassName = "ServerKt"
-}
+//tasks.withType<KotlinCompile>() {
+//    kotlinOptions.jvmTarget = "1.8"
+//}
