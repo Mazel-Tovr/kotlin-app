@@ -24,15 +24,15 @@ private val productGroupExample = mapOf(
 
 @Group("Product group operations")
 @Location(path.plus("/{id}"))
-private class productGroup(val id: Long)
+class productGroup(val id: Long)
 
 @Group("Product group operations")
 @Location(path)
-private class productGroups
+class productGroups
 
 @Group("Product group operations")
 @Location(path.plus("/all"))
-private class productGroupGeneric
+class productGroupGeneric
 
 
 fun Route.productGroupController(productGroupService: ICommonServices<ProductGroup>) {

@@ -24,15 +24,15 @@ private const val path: String = "/user"
 
 @Group("User operations")
 @Location(path.plus("/{id}"))
-private class user(val id: Long)
+class user(val id: Long)
 
 @Group("User operations")
 @Location(path)
-private class users
+class users
 
 @Group("User operations")
 @Location(path.plus("/all"))
-private class userGeneric
+class userGeneric
 
 
 
