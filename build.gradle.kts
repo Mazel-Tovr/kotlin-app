@@ -11,6 +11,7 @@ application {
     mainClassName = "com.epam.kotlinapp.ApplicationKt"
 }
 
+
 repositories {
     mavenCentral()
     jcenter()
@@ -40,7 +41,8 @@ dependencies {
     //implementation("com.github.papsign:Ktor-OpenAPI-Generator:-SNAPSHOT")
     implementation("com.github.nielsfalk:ktor-swagger:v0.7.0")
     implementation("junit:junit:4.4")
+    implementation("io.ktor:ktor-server-test-host:$ktorVersion")
 }
-//tasks.withType<KotlinCompile>() {
-//    kotlinOptions.jvmTarget = "1.8"
-//}
+tasks.withType<KotlinCompile>() {
+    kotlinOptions.jvmTarget = "1.8"
+}

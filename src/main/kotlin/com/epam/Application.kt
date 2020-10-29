@@ -28,9 +28,10 @@ import java.time.Duration
 data class Model<T>(val elements: MutableList<T>)
 
 
-fun main(args:Array<String>) {
+fun main() {
     val server = Server()
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
+
         install(DefaultHeaders)
         install(Compression)
         install(CallLogging)
@@ -59,9 +60,7 @@ fun main(args:Array<String>) {
             }
         }
 
-        install(WebSockets) {
-            pingPeriod = Duration.ofMinutes(1)
-        }
+        install(WebSockets)
 
 
         routing {
