@@ -7,6 +7,7 @@ import java.sql.DriverManager
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Deprecated("This shit tests")
 class DataBaseIntegrationTests {
 
     //Лучшеб я ничего не писал , чем это .....
