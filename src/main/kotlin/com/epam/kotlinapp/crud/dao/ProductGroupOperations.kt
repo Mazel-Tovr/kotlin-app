@@ -4,12 +4,15 @@ import com.epam.kotlinapp.crud.model.ProductGroup
 
 object ProductGroupOperations : ICommonOperations<ProductGroup> {
 
-    override fun create(entity: ProductGroup) {
+    override fun create(entity: ProductGroup): ProductGroup {
         val prepareStatement = ConnectionDB.conn
             .prepareStatement("INSERT INTO PRODUCT_GROUP VALUES (NULL,?)")
         prepareStatement.setString(1, entity.groupName)
         prepareStatement.executeUpdate()
-
+        val resultSet = prepareStatement.generatedKeys
+        resultSet.next();
+        entity.id = resultSet.getLong(1);
+        return entity;
     }
 
     override fun getEntity(id: Long): ProductGroup? {

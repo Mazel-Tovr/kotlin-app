@@ -14,12 +14,13 @@ object ProductService : ICommonServices<Product> {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val productOperations: ICommonOperations<Product> = ProductOperations
 
-    override fun create(entity: Product) {
-        try {
+    override fun create(entity: Product): Product? {
+        return try {
+            logger.info("Product added")
             productOperations.create(entity)
-            logger.info("User added")
         } catch (ex: SQLException) {
             logger.error(ex.message)
+            null
         }
     }
 

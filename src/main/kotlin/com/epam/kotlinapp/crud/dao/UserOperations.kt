@@ -1,18 +1,22 @@
 package com.epam.kotlinapp.crud.dao
 
 import com.epam.kotlinapp.crud.model.User
+import java.sql.Statement
 
 object UserOperations : ICommonOperations<User> {
 //    val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    override fun create(entity: User) {
+    override fun create(entity: User):User {
         val prepareStatement = ConnectionDB.conn
-            .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?)")
+            .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?)",Statement.RETURN_GENERATED_KEYS)
         prepareStatement.setString(1,entity.name)
         prepareStatement.setString(2,entity.email)
         prepareStatement.setString(3,entity.password)
         prepareStatement.executeUpdate()
-
+        val resultSet = prepareStatement.generatedKeys
+        resultSet.next();
+        entity.id = resultSet.getLong(1);
+        return entity;
     }
 
     override fun getEntity(id: Long): User? {

@@ -40,9 +40,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
     get<productGroupGeneric>("all".responds(ok<Model<ProductGroup>>())) {
         try {
-            call.respond(productGroupService.getAll())
+            call.respond(HttpStatusCode.OK,productGroupService.getAll())
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
         }
     }
     get<productGroup>(
@@ -54,9 +54,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
     {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(productGroupService.getEntity(id))
+            call.respond(HttpStatusCode.OK,productGroupService.getEntity(id))
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
         }
     }
     post<productGroups, ProductGroup>(
@@ -72,9 +72,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             )
     ) { _, entity: ProductGroup ->
         try {
-            call.respond(HttpStatusCode.Created, productGroupService.create(entity))
+            productGroupService.create(entity)?.let { call.respond(HttpStatusCode.OK, it) }
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
         }
     }
     //TODO It should work , but it doesn't , idk why
@@ -92,9 +92,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             val productGroup: ProductGroup = call.receive<ProductGroup>()
             productGroupService.delete(productGroup)
-            call.respond("Product group successfully removed")
+            call.respond(HttpStatusCode.OK,"Product group successfully removed")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
         }
     }
     delete<productGroup>(
@@ -106,9 +106,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             productGroupService.delete(id)
-            call.respond("Product group successfully removed")
+            call.respond(HttpStatusCode.OK,"Product group successfully removed")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
         }
     }
     put<productGroups,ProductGroup>( "update"
@@ -121,9 +121,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         )) { _, productGroup: ProductGroup ->
         try {
             productGroupService.update(productGroup)
-            call.respond(productGroup)
+            call.respond(HttpStatusCode.OK,productGroup)
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
         }
     }
 

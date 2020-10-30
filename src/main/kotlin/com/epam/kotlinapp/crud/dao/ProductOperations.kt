@@ -4,7 +4,7 @@ import com.epam.kotlinapp.crud.model.Product
 
 object ProductOperations : ICommonOperations<Product> {
 
-    override fun create(entity: Product) {
+    override fun create(entity: Product):Product {
         val prepareStatement = ConnectionDB.conn
             .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?,?,?)")
         prepareStatement.setString(1, entity.productName)
@@ -13,7 +13,10 @@ object ProductOperations : ICommonOperations<Product> {
         prepareStatement.setLong(4, entity.groupID)
         prepareStatement.setLong(5, entity.userId)
         prepareStatement.executeUpdate()
-
+        val resultSet = prepareStatement.generatedKeys
+        resultSet.next();
+        entity.id = resultSet.getLong(1);
+        return entity;
     }
 
     override fun getEntity(id: Long): Product? {
