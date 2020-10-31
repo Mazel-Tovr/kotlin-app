@@ -66,7 +66,7 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 example("Group", productGroupExample, summary = "super group")
             )
             .responds(
-                created<User>(
+                created<ProductGroup>(
                     example("Group", productGroupExample)
                 )
             )

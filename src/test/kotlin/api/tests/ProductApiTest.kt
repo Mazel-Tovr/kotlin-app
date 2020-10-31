@@ -2,6 +2,7 @@ package api.tests
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.ProductService
+import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.model.Product
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -9,11 +10,11 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.junit.FixMethodOrder
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import org.junit.runners.MethodSorters
 import java.lang.reflect.Type
 import java.util.ArrayList
-import kotlin.test.assertEquals
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ProductApiTest
@@ -23,7 +24,7 @@ class ProductApiTest
     private val service:ICommonServices<Product> = ProductService
 
     @Test
-    fun _1_getAllUserApiTest() = withTestApplication(Application::main) {
+    fun _1_getAllProductApiTest() = withTestApplication(Application::main) {
         with(handleRequest(HttpMethod.Get, "$url/all")) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<Product?>?>() {}.getType()
@@ -32,15 +33,15 @@ class ProductApiTest
     }
 
     @Test
-    fun _2_getUserByIdApiTest() = withTestApplication(Application::main) {
+    fun _2_getProductByIdApiTest() = withTestApplication(Application::main) {
         with(handleRequest(HttpMethod.Get, "$url/1")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(service.getEntity(1), gson.fromJson(response.content, Product::class.java))
         }
     }
 
-    @Test
-    fun _3_createAndDeleteUserApiTest() = withTestApplication(Application::main) {
+    @Test(ProductNotFoundException::class)
+    fun _3_createAndDeleteProductApiTest() = withTestApplication(Application::main) {
 
         var product:Product
         with(handleRequest(HttpMethod.Post, url) {
@@ -57,14 +58,14 @@ class ProductApiTest
             assertEquals(service.getEntity(product.id!!), product)
         }
 
-        with(handleRequest(HttpMethod.Delete, url) {
-            addHeader("accept","application/json")
-            addHeader("Content-Type" ,"application/json")
-            setBody(
-                gson.toJson(
-                    product
-                )
-            )
+        with(handleRequest(HttpMethod.Delete, url.plus("/${product.id}")) {
+            addHeader("accept", "application/json")
+            addHeader("Content-Type", "application/json")
+//            setBody(
+//                gson.toJson(
+//                    product
+//                )
+//            )
         }) {
             assertEquals(HttpStatusCode.OK, response.status())
             service.getEntity(product.id!!)

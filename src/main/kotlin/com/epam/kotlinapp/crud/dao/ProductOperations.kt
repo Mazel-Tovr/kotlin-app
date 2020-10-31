@@ -1,12 +1,16 @@
 package com.epam.kotlinapp.crud.dao
 
 import com.epam.kotlinapp.crud.model.Product
+import java.sql.Connection
+import java.sql.Statement
 
 object ProductOperations : ICommonOperations<Product> {
 
+    private var conn: Connection = ConnectionDB.conn
+
     override fun create(entity: Product):Product {
-        val prepareStatement = ConnectionDB.conn
-            .prepareStatement("INSERT INTO USER VALUES (NULL,?,?,?,?,?)")
+        val prepareStatement = conn
+            .prepareStatement("INSERT INTO PRODUCT VALUES (NULL,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS)
         prepareStatement.setString(1, entity.productName)
         prepareStatement.setInt(2, entity.price)
         prepareStatement.setString(3, entity.description)
@@ -20,7 +24,7 @@ object ProductOperations : ICommonOperations<Product> {
     }
 
     override fun getEntity(id: Long): Product? {
-        val prepareStatement = ConnectionDB.conn
+        val prepareStatement = conn
             .prepareStatement("SELECT * FROM PRODUCT WHERE id=?")
         prepareStatement.setLong(1, id)
 
@@ -36,7 +40,7 @@ object ProductOperations : ICommonOperations<Product> {
     }
 
     override fun update(entity: Product) {
-        val prepareStatement = ConnectionDB.conn
+        val prepareStatement = conn
             .prepareStatement(
                 "UPDATE PRODUCT SET product_name=?,price=?,description=?,group_id=?,user_id=? WHERE id=?"
             )
@@ -54,7 +58,7 @@ object ProductOperations : ICommonOperations<Product> {
     }
 
     override fun delete(id: Long) {
-        val prepareStatement = ConnectionDB.conn
+        val prepareStatement = conn
             .prepareStatement("DELETE FROM PRODUCT WHERE id = ?")
         prepareStatement.setLong(1, id);
         prepareStatement.executeUpdate();
@@ -62,7 +66,7 @@ object ProductOperations : ICommonOperations<Product> {
 
     override fun getAll(): List<Product> {
        val productList:MutableList<Product> = ArrayList()
-        val prepareStatement = ConnectionDB.conn
+        val prepareStatement = conn
             .prepareStatement("SELECT * FROM PRODUCT")
         
         val resultSet = prepareStatement.executeQuery()

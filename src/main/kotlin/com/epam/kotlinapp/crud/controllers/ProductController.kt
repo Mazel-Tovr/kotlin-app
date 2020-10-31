@@ -68,7 +68,7 @@ fun Route.productController(productService: ICommonServices<Product>) {
                 example("SuperDuperProduct", productExample, summary = "SuperDuperProduct")
             )
             .responds(
-                created<User>(
+                created<Product>(
                     example("SuperDuperProduct", productExample)
                 )
             )

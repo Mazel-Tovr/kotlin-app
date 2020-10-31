@@ -14,9 +14,17 @@ import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
+
+
 
 //Server for testing
 fun Application.main() {
+
     install(DefaultHeaders)
     install(CallLogging)
     install(Locations)
@@ -29,6 +37,9 @@ fun Application.main() {
         swagger = Swagger().apply {}
         openApi = OpenApi().apply {}
     }
+    //setting con to test bd
+
+
     routing {
         this.userController(UserService)
         this.productController(ProductService)

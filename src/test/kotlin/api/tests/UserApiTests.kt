@@ -2,6 +2,7 @@ package api.tests
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.UserService
+import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -41,7 +42,7 @@ class UserApiTests {
         }
     }
 
-    @Test
+    @Test(UserNotFoundException::class)
     fun _3_createAndDeleteUserApiTest() = withTestApplication(Application::main) {
 
         var userFromResponse:User
@@ -59,14 +60,14 @@ class UserApiTests {
             assertEquals(service.getEntity(userFromResponse.id!!), userFromResponse)
         }
 
-        with(handleRequest(HttpMethod.Delete, url) {
-            addHeader("accept","application/json")
-            addHeader("Content-Type" ,"application/json")
-            setBody(
-                gson.toJson(
-                    userFromResponse
-                )
-            )
+        with(handleRequest(HttpMethod.Delete, url.plus("/${userFromResponse.id}")) {
+            addHeader("accept", "application/json")
+            addHeader("Content-Type", "application/json")
+//            setBody(
+//                gson.toJson(
+//                    userFromResponse
+//                )
+//            )
         }) {
 
             assertEquals(HttpStatusCode.OK, response.status())

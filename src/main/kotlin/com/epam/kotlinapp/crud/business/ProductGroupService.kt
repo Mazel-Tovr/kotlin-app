@@ -16,8 +16,9 @@ object ProductGroupService : ICommonServices<ProductGroup> {
 
     override fun create(entity: ProductGroup):ProductGroup? {
        return try {
+           val create = productGroupOperations.create(entity)
            logger.info("Product group added")
-           productGroupOperations.create(entity)
+           create
         } catch (ex: SQLException) {
             logger.error(ex.message)
            return null
