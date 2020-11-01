@@ -2,6 +2,7 @@ package api.tests
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.ProductGroupService
+import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.model.ProductGroup
 import com.google.gson.GsonBuilder
@@ -15,6 +16,7 @@ import kotlin.test.assertEquals
 import org.junit.runners.MethodSorters
 import java.lang.reflect.Type
 import java.util.ArrayList
+import kotlin.test.BeforeTest
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ProductGroupApiTest
@@ -22,6 +24,12 @@ class ProductGroupApiTest
     private val url:String = "/productgroup"
     private val gson = GsonBuilder().create();
     private val service: ICommonServices<ProductGroup> = ProductGroupService
+
+    @BeforeTest
+    fun init()
+    {
+        RunApiTests.setConn(ProductOperations)
+    }
 
     @Test
     fun _1_getAllProductGroupApiTest() = withTestApplication(Application::main) {

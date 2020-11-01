@@ -2,6 +2,7 @@ package api.tests
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.UserService
+import com.epam.kotlinapp.crud.dao.UserOperations
 import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
 import com.google.gson.GsonBuilder
@@ -15,7 +16,7 @@ import java.lang.reflect.Type
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
+import kotlin.test.BeforeTest
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -23,6 +24,12 @@ class UserApiTests {
     private val url:String = "/user"
     private val gson = GsonBuilder().create();
     private val service: ICommonServices<User> = UserService
+
+    @BeforeTest
+    fun init()
+    {
+        RunApiTests.setConn(UserOperations)
+    }
 
 
     @Test

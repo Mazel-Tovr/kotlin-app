@@ -1,34 +1,25 @@
 import api.tests.ProductApiTest
 import api.tests.UserApiTests
 import api.tests.db.ConnectionToTestDB
-import com.epam.kotlinapp.crud.dao.ICommonOperations
-import com.epam.kotlinapp.crud.dao.ProductGroupOperations
-import com.epam.kotlinapp.crud.dao.ProductOperations
-import com.epam.kotlinapp.crud.dao.UserOperations
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
-import java.util.*
-import javax.swing.text.html.parser.Entity
-import kotlin.test.BeforeTest
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 @RunWith(Suite::class)
-@Suite.SuiteClasses(value = [ProductApiTest::class,ProductApiTest::class,UserApiTests::class])
+@Suite.SuiteClasses(value = [ProductApiTest::class, ProductApiTest::class, UserApiTests::class])
 class RunApiTests {
 
-    @BeforeTest
-    fun setConnToTestBd()
-    {
-       setConn(ProductGroupOperations)
-       setConn(UserOperations)
-       setConn(ProductOperations)
+    companion object {
+
+        fun setConn(someImpl: Any) {
+            val kClass = Class.forName(someImpl.javaClass.name).kotlin
+            val member = kClass.memberProperties.filterIsInstance<KMutableProperty<*>>()
+                    .firstOrNull { it.name == "conn" }
+            member?.isAccessible = true
+            member?.setter?.call(ConnectionToTestDB.conn)
+
+        }
     }
-
-
-    private fun setConn(someImpl: Any)
-    {
-        val clazz = someImpl::javaClass.get()
-        val field = clazz.getField("conn")
-        field.set(someImpl, ConnectionToTestDB.conn)
-    }
-
 }
