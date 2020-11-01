@@ -1,25 +1,18 @@
-import api.tests.ProductApiTest
-import api.tests.UserApiTests
-import api.tests.db.ConnectionToTestDB
+import api.ProductApiTest
+import api.ProductGroupApiTest
+import api.UserApiTests
+import chat.WebSocketTest
+import com.epam.kotlinapp.crud.model.ProductGroup
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 
 @RunWith(Suite::class)
-@Suite.SuiteClasses(value = [ProductApiTest::class, ProductApiTest::class, UserApiTests::class])
+@Suite.SuiteClasses(
+    value = [ProductApiTest::class,
+        ProductGroupApiTest::class,
+        UserApiTests::class,
+        WebSocketTest::class]
+)
 class RunApiTests {
 
-    companion object {
-
-        fun setConn(someImpl: Any) {
-            val kClass = Class.forName(someImpl.javaClass.name).kotlin
-            val member = kClass.memberProperties.filterIsInstance<KMutableProperty<*>>()
-                    .firstOrNull { it.name == "conn" }
-            member?.isAccessible = true
-            member?.setter?.call(ConnectionToTestDB.conn)
-
-        }
-    }
 }

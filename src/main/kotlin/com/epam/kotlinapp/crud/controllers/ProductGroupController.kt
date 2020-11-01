@@ -72,7 +72,7 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             )
     ) { _, entity: ProductGroup ->
         try {
-            productGroupService.create(entity)?.let { call.respond(HttpStatusCode.OK, it) }
+            productGroupService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
         } catch (ex: Exception) {
             ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
         }

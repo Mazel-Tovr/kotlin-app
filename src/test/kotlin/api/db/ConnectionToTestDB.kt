@@ -1,4 +1,4 @@
-package api.tests.db
+package api.db
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,7 +18,7 @@ object ConnectionToTestDB {
 
     init {
         try {
-            logger.info("Connecting to Database")
+            logger.info("Connecting to test Database")
             Class.forName("org.h2.Driver");
             conn = DriverManager.getConnection(path, username, password)
             logger.info("Connection to test is established")

@@ -1,8 +1,7 @@
-package api.tests
+package api
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.ProductService
-import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.model.Product
 import com.google.gson.GsonBuilder
@@ -10,13 +9,13 @@ import com.google.gson.reflect.TypeToken
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import main
 import org.junit.FixMethodOrder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.junit.runners.MethodSorters
 import java.lang.reflect.Type
 import java.util.ArrayList
-import kotlin.test.BeforeTest
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ProductApiTest
@@ -25,11 +24,7 @@ class ProductApiTest
     private val gson = GsonBuilder().create();
     private val service:ICommonServices<Product> = ProductService
 
-    @BeforeTest
-    fun init()
-    {
-        RunApiTests.setConn(ProductOperations)
-    }
+
 
 
     @Test

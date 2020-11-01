@@ -29,7 +29,7 @@ class Server {
         for (message in messages) {
             newSession.send(Frame.Text(message))
         }
-        sendToAll("server", "New user in the chat: ${user.name} ")
+        sendToAll("server", "New user in the chat: ${user.name}")
         sendToAll("server", "Users online : ${countOfUsers.incrementAndGet()}")
     }
 

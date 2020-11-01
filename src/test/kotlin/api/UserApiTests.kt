@@ -1,4 +1,4 @@
-package api.tests
+package api
 
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.business.UserService
@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import main
 import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
 import java.lang.reflect.Type
@@ -25,11 +26,6 @@ class UserApiTests {
     private val gson = GsonBuilder().create();
     private val service: ICommonServices<User> = UserService
 
-    @BeforeTest
-    fun init()
-    {
-        RunApiTests.setConn(UserOperations)
-    }
 
 
     @Test
