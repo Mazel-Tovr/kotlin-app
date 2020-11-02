@@ -5,7 +5,9 @@ import chat.WebSocketTest
 import com.epam.kotlinapp.crud.model.ProductGroup
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
+import kotlin.test.Ignore
 
+@Ignore
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
     value = [ProductApiTest::class,

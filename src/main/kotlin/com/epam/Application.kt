@@ -30,10 +30,10 @@ data class Model<T>(val elements: MutableList<T>)
 
 fun main() {
     val server = Server()
-    embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
+    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
 
         install(DefaultHeaders)
-        install(Compression)
+//        install(Compression)
         install(CallLogging)
         install(ContentNegotiation) {
             gson {

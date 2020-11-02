@@ -51,6 +51,7 @@ class ChatClient {
                     }
                 }
             }
+
             while (true) {
                 val line = readLine() ?: ""
                 if (line != exitWord) send(line)

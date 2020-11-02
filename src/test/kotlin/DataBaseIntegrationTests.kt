@@ -1,6 +1,7 @@
 import com.epam.kotlinapp.crud.model.User
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import java.sql.Connection
 import java.sql.DriverManager
@@ -8,6 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Deprecated("This shit tests")
+@Ignore
 class DataBaseIntegrationTests {
 
     //Лучшеб я ничего не писал , чем это .....

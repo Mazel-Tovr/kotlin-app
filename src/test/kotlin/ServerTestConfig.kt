@@ -1,4 +1,4 @@
-import api.db.ConnectionToTestDB
+import db.ConnectionToTestDB
 import com.epam.kotlinapp.chat.server.Server
 import com.epam.kotlinapp.chat.server.webSocket
 import com.epam.kotlinapp.crud.business.ProductGroupService
@@ -7,6 +7,7 @@ import com.epam.kotlinapp.crud.business.UserService
 import com.epam.kotlinapp.crud.controllers.productController
 import com.epam.kotlinapp.crud.controllers.productGroupController
 import com.epam.kotlinapp.crud.controllers.userController
+import com.epam.kotlinapp.crud.dao.ICommonOperations
 import com.epam.kotlinapp.crud.dao.ProductGroupOperations
 import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.dao.UserOperations
@@ -56,7 +57,7 @@ fun Application.main() {
     }
 }
 
-private fun setConn(someImpl: Any) {
+private fun setConn(someImpl: ICommonOperations<*>) {
     val kClass = Class.forName(someImpl.javaClass.name).kotlin
     val member = kClass.memberProperties.filterIsInstance<KMutableProperty<*>>()
         .firstOrNull { it.name == "conn" }
