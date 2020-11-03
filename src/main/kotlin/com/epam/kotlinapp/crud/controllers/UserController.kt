@@ -35,15 +35,12 @@ class users
 class userGeneric
 
 
-
 fun Route.userController(userService: ICommonServices<User>) {
 
     get<userGeneric>("all".responds(ok<Model<User>>())) {
-        try {
-            call.respond(HttpStatusCode.OK,userService.getAll())
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
-        }
+
+        call.respond(HttpStatusCode.OK, userService.getAll())
+
     }
     get<user>(
         "find".responds(
@@ -53,9 +50,9 @@ fun Route.userController(userService: ICommonServices<User>) {
     ) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK,userService.getEntity(id))
+            call.respond(HttpStatusCode.OK, userService.getEntity(id))
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
         }
     }
     post<users, User>(
@@ -74,29 +71,10 @@ fun Route.userController(userService: ICommonServices<User>) {
 //            val user: User = call.receive<User>()
             userService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
-    //TODO It should work , but it doesn't , idk why
-    delete<users>(
-        "delete"
-            .description("Delete user from db")
-            .examples(
-                example("Sanya", userExample, summary = "Just Sashka")
-            )
-            .responds(
-                ok<Unit>(),
-                notFound()
-            )
-    ) {
-        try {
-            val user: User = call.receive<User>()
-            userService.delete(user)
-            call.respond(HttpStatusCode.OK,"User successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
-        }
-    }
+
     delete<user>(
         "delete".responds(
             ok<Unit>(),
@@ -106,9 +84,9 @@ fun Route.userController(userService: ICommonServices<User>) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             userService.delete(id)
-            call.respond(HttpStatusCode.OK,"User successfully removed")
+            call.respond(HttpStatusCode.OK, "User successfully removed")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
     put<users, User>(
@@ -124,9 +102,9 @@ fun Route.userController(userService: ICommonServices<User>) {
         try {
             //val user: User = call.receive<User>()
             userService.update(user)
-            call.respond(HttpStatusCode.OK,user)
+            call.respond(HttpStatusCode.OK, user)
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
 }

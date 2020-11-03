@@ -3,6 +3,7 @@ package com.epam.kotlinapp.chat.server
 import io.ktor.client.features.*
 import io.ktor.http.cio.websocket.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
 data class User(val name: String)
@@ -15,7 +16,7 @@ class Server {
 
     private val countOfUsers = AtomicInteger();
 
-    private val messages = ArrayList<String>(10);
+    private val messages = ConcurrentLinkedQueue<String>();
 
     init {
         countOfUsers.set(0);
@@ -42,14 +43,12 @@ class Server {
 
     suspend fun sendMessage(user: User, message: String) {
         sendToAll(user.name, message)
-        synchronized(messages)
-        {
-            messages += if (messages.size < 9) {
-                "<${user.name}> $message"
-            } else {
-                messages.removeFirst()
-                "<${user.name}> $message"
-            }
+
+        messages += if (messages.size < 9) {
+            "<${user.name}> $message"
+        } else {
+            messages.remove()
+            "<${user.name}> $message"
         }
 
 

@@ -51,6 +51,7 @@ object ConnectionToTestDB {
                         "  `group_name` varchar(50) DEFAULT NULL\n" +
                         ");\n" +
                         "INSERT INTO PRODUCT_GROUP VALUES (1,'Super Duper Group');\n"+
+                        "INSERT INTO PRODUCT_GROUP VALUES (2,'Super Duper Group v2');\n"+
                         "DROP TABLE IF EXISTS `user`;\n" +
                         "CREATE TABLE `user` (\n" +
                         "  `id` IDENTITY NOT NULL PRIMARY KEY,\n" +
@@ -60,7 +61,10 @@ object ConnectionToTestDB {
                         ");\n" +
                         "INSERT INTO `user` (`id`, `name`, `email`, `password`) VALUES\n" +
                         "(1, 'Roma', 'roma@mail.ru', '123');"+
-                        "INSERT INTO PRODUCT VALUES (1,'Телефон','228','Nokia 330','1','1');\n"
+                        "INSERT INTO `user` (`id`, `name`, `email`, `password`) VALUES\n" +
+                        "(2, 'Sanya', 'sanya@mail.ru', '123');"+
+                        "INSERT INTO PRODUCT VALUES (1,'Телефон','228','Nokia 330','1','1');\n"+
+                        "INSERT INTO PRODUCT VALUES (2,'IТелефон','1337','Samsung','2','2');\n"
         ).execute()
     }
 

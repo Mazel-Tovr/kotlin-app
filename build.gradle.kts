@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.4.10"
     id("application")
+    id("com.github.johnrengelman.shadow") version "4.0.4"
 }
 group = "com.epam"
 version = "1.0-SNAPSHOT"
@@ -10,7 +11,11 @@ version = "1.0-SNAPSHOT"
 application {
     mainClassName = "com.epam.kotlinapp.ApplicationKt"
 }
-
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
+}
 
 repositories {
     mavenCentral()

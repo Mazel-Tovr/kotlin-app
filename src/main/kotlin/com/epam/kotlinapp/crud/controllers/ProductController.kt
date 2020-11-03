@@ -41,11 +41,9 @@ class productGeneric
 fun Route.productController(productService: ICommonServices<Product>) {
 
     get<productGeneric>("all".responds(ok<Model<Product>>())) {
-        try {
-            call.respond(HttpStatusCode.OK,productService.getAll())
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
-        }
+
+        call.respond(HttpStatusCode.OK, productService.getAll())
+
     }
     get<product>(
         "find".responds(
@@ -56,9 +54,9 @@ fun Route.productController(productService: ICommonServices<Product>) {
     {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK,productService.getEntity(id))
+            call.respond(HttpStatusCode.OK, productService.getEntity(id))
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
         }
     }
     post<products, Product>(
@@ -76,27 +74,7 @@ fun Route.productController(productService: ICommonServices<Product>) {
         try {
             productService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
-        }
-    }
-    //TODO It should work , but it doesn't , idk why
-    delete<products>(
-        "delete"
-            .description("Delete product from db")
-            .examples(
-                example("SuperDuperProduct", productExample, summary = "SuperDuperProduct")
-            )
-            .responds(
-                ok<Unit>(),
-                notFound()
-            )
-    ) {
-        try {
-            val product: Product = call.receive<Product>()
-            productService.delete(product)
-            call.respond(HttpStatusCode.OK,"Product successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
     delete<product>(
@@ -113,9 +91,9 @@ fun Route.productController(productService: ICommonServices<Product>) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             productService.delete(id)
-            call.respond(HttpStatusCode.OK,"Product successfully removed")
+            call.respond(HttpStatusCode.OK, "Product successfully removed")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
     put<products, Product>(
@@ -130,9 +108,9 @@ fun Route.productController(productService: ICommonServices<Product>) {
     ) { _, product: Product ->
         try {
             productService.update(product)
-            call.respond(HttpStatusCode.OK,product)
+            call.respond(HttpStatusCode.OK, product)
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
 }

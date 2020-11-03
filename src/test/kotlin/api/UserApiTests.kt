@@ -1,9 +1,5 @@
 package api
 
-import com.epam.kotlinapp.crud.business.ICommonServices
-import com.epam.kotlinapp.crud.business.UserService
-import com.epam.kotlinapp.crud.dao.UserOperations
-import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -11,47 +7,45 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import main
-import org.junit.FixMethodOrder
-import org.junit.runners.MethodSorters
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.BeforeTest
 
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class UserApiTests {
-    private val url:String = "/user"
-    private val gson = GsonBuilder().create();
-    private val service: ICommonServices<User> = UserService
 
+    private val url: String = "/user"
+    private val gson = GsonBuilder().create()
+    private val expectedUser: User = User(1, "Roma", "roma@mail.ru", "123")
+    private val expectedAllUsersList: List<User> = listOf(expectedUser, User(2, "Sanya", "sanya@mail.ru", "123"))
+    private val userIdToDelete: Int = 2
 
 
     @Test
-    fun _1_getAllUserApiTest() = withTestApplication(Application::main) {
+    fun getAllUserApiTest() = withTestApplication(Application::main) {
         with(handleRequest(HttpMethod.Get, "$url/all")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            val groupListType: Type = object : TypeToken<ArrayList<User?>?>() {}.getType()
-            assertEquals(service.getAll(), gson.fromJson(response.content, groupListType))
+            val groupListType: Type = object : TypeToken<ArrayList<User?>?>() {}.type
+            assertEquals(expectedAllUsersList, gson.fromJson(response.content, groupListType))
         }
     }
 
     @Test
-    fun _2_getUserByIdApiTest() = withTestApplication(Application::main) {
+    fun getUserByIdApiTest() = withTestApplication(Application::main) {
         with(handleRequest(HttpMethod.Get, "$url/1")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals(service.getEntity(1), gson.fromJson(response.content, User::class.java))
+            assertEquals(expectedUser, gson.fromJson(response.content, User::class.java))
         }
     }
 
-    @Test(UserNotFoundException::class)
-    fun _3_createAndDeleteUserApiTest() = withTestApplication(Application::main) {
+    @Test
+    fun createUserApiTest() = withTestApplication(Application::main) {
 
-        var userFromResponse:User
+        var userFromResponse: User
         with(handleRequest(HttpMethod.Post, url) {
-            addHeader("accept","application/json")
-            addHeader("Content-Type" ,"application/json")
+            addHeader("accept", "application/json")
+            addHeader("Content-Type", "application/json")
             setBody(
                 gson.toJson(
                     User(0, "User", "User", "User")
@@ -60,24 +54,28 @@ class UserApiTests {
         }) {
             assertEquals(HttpStatusCode.Created, response.status())
             userFromResponse = gson.fromJson(response.content, User::class.java)
-            assertEquals(service.getEntity(userFromResponse.id!!), userFromResponse)
+            val expectedNewUser = User(userFromResponse.id, "User", "User", "User")
+
+            assertEquals(expectedNewUser, userFromResponse)
         }
 
-        with(handleRequest(HttpMethod.Delete, url.plus("/${userFromResponse.id}")) {
+
+    }
+
+    @Test
+    fun deleteUserApiTest() = withTestApplication(Application::main) {
+
+        with(handleRequest(HttpMethod.Delete, "$url/$userIdToDelete") {
             addHeader("accept", "application/json")
             addHeader("Content-Type", "application/json")
-//            setBody(
-//                gson.toJson(
-//                    userFromResponse
-//                )
-//            )
+
         }) {
 
             assertEquals(HttpStatusCode.OK, response.status())
-            service.getEntity(userFromResponse.id!!)
             return@withTestApplication
         }
     }
 
-
 }
+
+

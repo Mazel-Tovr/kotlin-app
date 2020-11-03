@@ -40,9 +40,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
     get<productGroupGeneric>("all".responds(ok<Model<ProductGroup>>())) {
         try {
-            call.respond(HttpStatusCode.OK,productGroupService.getAll())
+            call.respond(HttpStatusCode.OK, productGroupService.getAll())
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
         }
     }
     get<productGroup>(
@@ -54,9 +54,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
     {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK,productGroupService.getEntity(id))
+            call.respond(HttpStatusCode.OK, productGroupService.getEntity(id))
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
         }
     }
     post<productGroups, ProductGroup>(
@@ -71,32 +71,11 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 )
             )
     ) { _, entity: ProductGroup ->
-        try {
-            productGroupService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
-        }
+
+        productGroupService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
+
     }
-    //TODO It should work , but it doesn't , idk why
-    delete<productGroups>(
-        "delete"
-            .description("Delete product group from db")
-            .examples(
-                example("Group", productGroupExample, summary = "super group")
-            )
-            .responds(
-                ok<Unit>(),
-                notFound()
-            )
-    ) {
-        try {
-            val productGroup: ProductGroup = call.receive<ProductGroup>()
-            productGroupService.delete(productGroup)
-            call.respond(HttpStatusCode.OK,"Product group successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
-        }
-    }
+
     delete<productGroup>(
         "delete".responds(
             ok<Unit>(),
@@ -106,24 +85,26 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             productGroupService.delete(id)
-            call.respond(HttpStatusCode.OK,"Product group successfully removed")
+            call.respond(HttpStatusCode.OK, "Product group successfully removed")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
-    put<productGroups,ProductGroup>( "update"
-        .description("Update produt group in db (by his id)")
-        .examples(
-            example("Group", productGroupExample, summary = "super group")
-        ).responds(
-            ok<ProductGroup>(),
-            notFound()
-        )) { _, productGroup: ProductGroup ->
+    put<productGroups, ProductGroup>(
+        "update"
+            .description("Update produt group in db (by his id)")
+            .examples(
+                example("Group", productGroupExample, summary = "super group")
+            ).responds(
+                ok<ProductGroup>(),
+                notFound()
+            )
+    ) { _, productGroup: ProductGroup ->
         try {
             productGroupService.update(productGroup)
-            call.respond(HttpStatusCode.OK,productGroup)
+            call.respond(HttpStatusCode.OK, productGroup)
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed,it1) }
+            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
         }
     }
 
