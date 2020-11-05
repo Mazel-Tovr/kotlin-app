@@ -6,12 +6,9 @@ import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.util.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 import kotlin.concurrent.thread
 
@@ -44,21 +41,19 @@ class ChatClient {
 
             print("Enter nick name: ")
             this.send(Frame.Text(readLine() ?: ""))
-            thread(start = true) {
+            launch {
                 while (true) {
-                    when (val frame = incoming.poll()) {
-                        is Frame.Text -> println(frame.readText())
-                    }
+                    val line = withContext(Dispatchers.IO) { readLine() } ?: ""
+                    if (line != exitWord) send(line)
                 }
             }
 
             while (true) {
-                val line = readLine() ?: ""
-                if (line != exitWord) send(line)
-                when (val frame = incoming.poll()) {
+                when (val frame = incoming.receive()) {
                     is Frame.Text -> println(frame.readText())
                 }
             }
+
 
         }
     }

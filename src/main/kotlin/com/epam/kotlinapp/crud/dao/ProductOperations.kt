@@ -53,9 +53,7 @@ object ProductOperations : ICommonOperations<Product> {
         prepareStatement.executeUpdate();
     }
 
-    override fun delete(entity: Product) {
-        entity.id?.let { delete(it) }
-    }
+
 
     override fun delete(id: Long) {
         val prepareStatement = conn

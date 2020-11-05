@@ -2,17 +2,16 @@ package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.exceptions.DataException
+import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.model.ProductGroup
-import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
-import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import java.lang.Exception
 
 private const val path: String = "/productgroup"
 
@@ -39,12 +38,9 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
 
     get<productGroupGeneric>("all".responds(ok<Model<ProductGroup>>())) {
-        try {
-            call.respond(HttpStatusCode.OK, productGroupService.getAll())
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
-        }
+        call.respond(HttpStatusCode.OK, productGroupService.getAll())
     }
+
     get<productGroup>(
         "find".responds(
             ok<ProductGroup>(),
@@ -54,9 +50,13 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
     {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK, productGroupService.getEntity(id))
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
+            val entity = productGroupService.getEntity(id)
+            if (entity != null)
+                call.respond(HttpStatusCode.OK, entity)
+            else
+                call.respond(HttpStatusCode.BadRequest, "")
+        } catch (ex: ProductNotFoundException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     post<productGroups, ProductGroup>(
@@ -72,8 +72,15 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             )
     ) { _, entity: ProductGroup ->
 
-        productGroupService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
-
+        val productGroup = productGroupService.create(entity)
+        try {
+            if (productGroup != null)
+                call.respond(HttpStatusCode.Created, productGroup)
+            else
+                call.respond(HttpStatusCode.BadRequest, "")
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
+        }
     }
 
     delete<productGroup>(
@@ -86,8 +93,8 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             val id: Long = call.parameters["id"]!!.toLong()
             productGroupService.delete(id)
             call.respond(HttpStatusCode.OK, "Product group successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     put<productGroups, ProductGroup>(
@@ -103,8 +110,8 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             productGroupService.update(productGroup)
             call.respond(HttpStatusCode.OK, productGroup)
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
 

@@ -2,6 +2,8 @@ package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.exceptions.DataException
+import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
@@ -50,9 +52,13 @@ fun Route.userController(userService: ICommonServices<User>) {
     ) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK, userService.getEntity(id))
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
+            val entity = userService.getEntity(id)
+            if (entity != null)
+                call.respond(HttpStatusCode.OK, entity)
+            else
+                call.respond(HttpStatusCode.BadRequest,"")
+        } catch (ex: UserNotFoundException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     post<users, User>(
@@ -68,10 +74,13 @@ fun Route.userController(userService: ICommonServices<User>) {
             )
     ) { _, entity: User ->
         try {
-//            val user: User = call.receive<User>()
-            userService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+            val user = userService.create(entity);
+            if (user!= null)
+                call.respond(HttpStatusCode.Created, user)
+            else
+                call.respond(HttpStatusCode.BadRequest, "")
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
 
@@ -85,8 +94,8 @@ fun Route.userController(userService: ICommonServices<User>) {
             val id: Long = call.parameters["id"]!!.toLong()
             userService.delete(id)
             call.respond(HttpStatusCode.OK, "User successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     put<users, User>(
@@ -103,8 +112,8 @@ fun Route.userController(userService: ICommonServices<User>) {
             //val user: User = call.receive<User>()
             userService.update(user)
             call.respond(HttpStatusCode.OK, user)
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
 }

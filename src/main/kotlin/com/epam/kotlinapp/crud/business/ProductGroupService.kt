@@ -14,43 +14,41 @@ object ProductGroupService : ICommonServices<ProductGroup> {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val productGroupOperations: ICommonOperations<ProductGroup> = ProductGroupOperations
 
-    override fun create(entity: ProductGroup):ProductGroup? {
-       return try {
-           val create = productGroupOperations.create(entity)
-           logger.info("Product group added")
-           create
+    override fun create(entity: ProductGroup): ProductGroup? {
+        var create: ProductGroup? = null
+        try {
+            create = productGroupOperations.create(entity)
+            logger.info("ProductGroup group added")
         } catch (ex: SQLException) {
             logger.error(ex.message)
-           return null
+
         }
+        return create ?: throw DataException("ProductGroup couldn't be created")
     }
 
-    override fun getEntity(id: Long): ProductGroup {
+    override fun getEntity(id: Long): ProductGroup? {
         var productGroup: ProductGroup? = null;
         try {
             productGroup = productGroupOperations.getEntity(id);
-            return productGroup ?: throw ProductGroupNotFoundException("ProductGroup with id = $id couldn't found")
-
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        productGroup.let { return it!! }
+        return productGroup ?: throw ProductGroupNotFoundException("ProductGroup with id = $id couldn't found")
+
     }
 
     override fun getAll(): List<ProductGroup> {
-        var list: List<ProductGroup> = emptyList();
         try {
-            list = productGroupOperations.getAll();
-            return list.ifEmpty { throw ProductGroupNotFoundException("ProductGroups couldn't be found") }
+            return productGroupOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return list
+        return emptyList()
     }
 
     override fun update(entity: ProductGroup) {
         try {
-            if (entity.id == null)
+            if (entity.id == null || entity.id == 0L)
                 throw DataException("Product group id can't be empty")
             else productGroupOperations.update(entity)
         } catch (ex: SQLException) {
@@ -58,17 +56,12 @@ object ProductGroupService : ICommonServices<ProductGroup> {
         }
     }
 
-    override fun delete(entity: ProductGroup) {
-        try {
-            productGroupOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-    }
 
     override fun delete(id: Long) {
         try {
-            productGroupOperations.delete(id)
+            if (id == 0L)
+                throw DataException("Product group id can't be empty")
+            else productGroupOperations.delete(id)
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }

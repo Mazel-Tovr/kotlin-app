@@ -2,6 +2,7 @@ package com.epam.kotlinapp.crud.business
 
 import com.epam.kotlinapp.crud.dao.ICommonOperations
 import com.epam.kotlinapp.crud.dao.UserOperations
+import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
 import org.slf4j.Logger
@@ -14,33 +15,31 @@ object UserService : ICommonServices<User> {
     private val userOperations: ICommonOperations<User> = UserOperations
 
     override fun create(entity: User): User? {
-        return try {
-            val user = userOperations.create(entity);
+        var user: User? = null;
+        try {
+            user = userOperations.create(entity);
             logger.info("User added")
-            user
         } catch (ex: SQLException) {
             logger.error(ex.message)
-            null;
         }
+        return user ?: throw DataException("User couldn't be created")
     }
 
-    override fun getEntity(id: Long): User {
+    override fun getEntity(id: Long): User? {
         var user: User? = null
         try {
             user = userOperations.getEntity(id)
-            return user ?: throw UserNotFoundException("User with id = $id couldn't found")
 
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        user.let { return it!! }
+        return user ?: throw UserNotFoundException("User with id = $id couldn't found")
     }
 
     override fun getAll(): List<User> {
         var list: List<User> = emptyList();
         try {
             list = userOperations.getAll();
-            return list
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
@@ -49,23 +48,20 @@ object UserService : ICommonServices<User> {
 
     override fun update(entity: User) {
         try {
-            userOperations.update(entity)
+            if (entity.id == null || entity.id == 0L)
+                throw DataException("User id can't be empty")
+            else userOperations.update(entity)
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
     }
 
-    override fun delete(entity: User) {
-        try {
-            userOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-    }
 
     override fun delete(id: Long) {
         try {
-            userOperations.delete(id)
+            if (id == 0L)
+                throw DataException("User id can't be empty")
+            else userOperations.delete(id)
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }

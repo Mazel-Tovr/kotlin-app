@@ -15,42 +15,38 @@ object ProductService : ICommonServices<Product> {
     private val productOperations: ICommonOperations<Product> = ProductOperations
 
     override fun create(entity: Product): Product? {
-        return try {
-            val create = productOperations.create(entity)
+        var create: Product? = null
+        try {
+            create = productOperations.create(entity);
             logger.info("Product added")
-            create
         } catch (ex: SQLException) {
             logger.error(ex.message)
-            null
         }
+        return create ?: throw DataException("Product couldn't be created")
     }
 
-    override fun getEntity(id: Long): Product {
+    override fun getEntity(id: Long): Product? {
         var product: Product? = null;
         try {
             product = productOperations.getEntity(id);
-            return product ?: throw ProductNotFoundException("Product with id = $id couldn't found")
-
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        product.let { return it!! }
+        return product ?: throw ProductNotFoundException("Product with id = $id couldn't found")
     }
 
     override fun getAll(): List<Product> {
-        var list: List<Product> = emptyList();
         try {
-            list = productOperations.getAll();
-            return list.ifEmpty { throw ProductNotFoundException("Products couldn't be found") }
+            return productOperations.getAll();
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return list
+        return emptyList();
     }
 
     override fun update(entity: Product) {
         try {
-            if (entity.id == null)
+            if (entity.id == null || entity.id == 0L)
                 throw DataException("Product id can't be empty")
             else productOperations.update(entity)
         } catch (ex: SQLException) {
@@ -58,17 +54,11 @@ object ProductService : ICommonServices<Product> {
         }
     }
 
-    override fun delete(entity: Product) {
-        try {
-            productOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-    }
-
     override fun delete(id: Long) {
         try {
-            productOperations.delete(id)
+            if (id == 0L)
+                throw DataException("Product id can't be empty")
+            else productOperations.delete(id)
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }

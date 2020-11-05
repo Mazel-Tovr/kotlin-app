@@ -2,14 +2,14 @@ package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.exceptions.DataException
+import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
 import com.epam.kotlinapp.crud.model.Product
-import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
-import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import java.lang.Exception
@@ -54,11 +54,16 @@ fun Route.productController(productService: ICommonServices<Product>) {
     {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
-            call.respond(HttpStatusCode.OK, productService.getEntity(id))
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.NotFound, it1) }
+            val entity = productService.getEntity(id)
+            if (entity != null)
+                call.respond(HttpStatusCode.OK, entity)
+            else
+                call.respond(HttpStatusCode.BadRequest,"")
+        } catch (ex: ProductGroupNotFoundException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
+
     post<products, Product>(
         "create"
             .description("Add new product to date base\nId independence")
@@ -72,9 +77,13 @@ fun Route.productController(productService: ICommonServices<Product>) {
             )
     ) { _, entity: Product ->
         try {
-            productService.create(entity)?.let { call.respond(HttpStatusCode.Created, it) }
+            val product = productService.create(entity);
+            if (product!= null)
+                call.respond(HttpStatusCode.Created, product)
+            else
+                call.respond(HttpStatusCode.BadRequest, "")
         } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     delete<product>(
@@ -92,8 +101,8 @@ fun Route.productController(productService: ICommonServices<Product>) {
             val id: Long = call.parameters["id"]!!.toLong()
             productService.delete(id)
             call.respond(HttpStatusCode.OK, "Product successfully removed")
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     put<products, Product>(
@@ -109,8 +118,8 @@ fun Route.productController(productService: ICommonServices<Product>) {
         try {
             productService.update(product)
             call.respond(HttpStatusCode.OK, product)
-        } catch (ex: Exception) {
-            ex.message?.let { it1 -> call.respond(HttpStatusCode.ExpectationFailed, it1) }
+        } catch (ex: DataException) {
+            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
 }

@@ -42,9 +42,6 @@ object ProductGroupOperations : ICommonOperations<ProductGroup> {
         prepareStatement.executeUpdate();
     }
 
-    override fun delete(entity: ProductGroup) {
-        entity.id?.let { delete(it) }
-    }
 
     override fun delete(id: Long) {
         val prepareStatement = conn
