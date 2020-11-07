@@ -6,8 +6,8 @@ import com.epam.kotlinapp.crud.business.ProductGroupService
 import com.epam.kotlinapp.crud.business.ProductService
 import com.epam.kotlinapp.crud.business.UserService
 import com.epam.kotlinapp.crud.controllers.productController
-import com.epam.kotlinapp.crud.controllers.productGroupController
 import com.epam.kotlinapp.crud.controllers.userController
+import com.epam.kotlinapp.crud.controllers.productGroupController
 import de.nielsfalk.ktor.swagger.SwaggerSupport
 import de.nielsfalk.ktor.swagger.version.shared.Contact
 import de.nielsfalk.ktor.swagger.version.shared.Information
@@ -16,21 +16,20 @@ import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
-import io.ktor.http.cio.websocket.*
 import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
-import java.time.Duration
 
 
 data class Model<T>(val elements: MutableList<T>)
 
 
+@KtorExperimentalLocationsAPI
 fun main() {
     val server = Server()
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
 
         install(DefaultHeaders)
 //        install(Compression)
@@ -64,9 +63,10 @@ fun main() {
 
 
         routing {
-            this.userController(UserService)
-            this.productController(ProductService)
-            this.productGroupController(ProductGroupService)
+
+            this.userController(UserService,server)
+            this.productController(ProductService,server)
+            this.productGroupController(ProductGroupService,server)
             this.webSocket(server)
 
         }

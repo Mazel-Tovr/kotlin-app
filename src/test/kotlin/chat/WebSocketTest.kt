@@ -6,9 +6,11 @@ import io.ktor.http.cio.websocket.*
 import io.ktor.server.testing.*
 import main
 import java.lang.Exception
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore
 class WebSocketTest {
 
     private val userName = "Roma"

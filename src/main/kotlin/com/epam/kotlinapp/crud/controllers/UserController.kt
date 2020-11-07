@@ -4,13 +4,14 @@ import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
+import com.epam.kotlinapp.crud.listener.Event.*
+import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.model.User
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
-import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
@@ -24,23 +25,28 @@ private val userExample = mapOf(
 
 private const val path: String = "/user"
 
+@KtorExperimentalLocationsAPI
 @Group("User operations")
 @Location(path.plus("/{id}"))
 class user(val id: Long)
 
+@KtorExperimentalLocationsAPI
 @Group("User operations")
 @Location(path)
 class users
 
+@KtorExperimentalLocationsAPI
 @Group("User operations")
 @Location(path.plus("/all"))
 class userGeneric
 
 
-fun Route.userController(userService: ICommonServices<User>) {
+@KtorExperimentalLocationsAPI
+fun Route.userController(userService: ICommonServices<User>, observer: IObserver) {
 
     get<userGeneric>("all".responds(ok<Model<User>>())) {
 
+        observer.onEvent(READ, "Getting all users")
         call.respond(HttpStatusCode.OK, userService.getAll())
 
     }
@@ -53,11 +59,16 @@ fun Route.userController(userService: ICommonServices<User>) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             val entity = userService.getEntity(id)
-            if (entity != null)
+            if (entity != null) {
+                observer.onEvent(READ, "Getting user with id = $id")
                 call.respond(HttpStatusCode.OK, entity)
-            else
-                call.respond(HttpStatusCode.BadRequest,"")
+            }
+            else {
+                observer.onEvent(READ, "Getting user with id = $id but something went wrong")
+                call.respond(HttpStatusCode.BadRequest, "")
+            }
         } catch (ex: UserNotFoundException) {
+            observer.onEvent(READ, "Trying to get user by id but ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
@@ -75,11 +86,16 @@ fun Route.userController(userService: ICommonServices<User>) {
     ) { _, entity: User ->
         try {
             val user = userService.create(entity);
-            if (user!= null)
+            if (user!= null) {
+                observer.onEvent(CREATE, "Creating new user $user")
                 call.respond(HttpStatusCode.Created, user)
-            else
+            }
+            else {
+                observer.onEvent(CREATE, "User wasn't created")
                 call.respond(HttpStatusCode.BadRequest, "")
+            }
         } catch (ex: DataException) {
+            observer.onEvent(CREATE, "User wasn't created ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
@@ -93,8 +109,10 @@ fun Route.userController(userService: ICommonServices<User>) {
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             userService.delete(id)
+            observer.onEvent(DELETE, "User was deleted")
             call.respond(HttpStatusCode.OK, "User successfully removed")
         } catch (ex: DataException) {
+            observer.onEvent(DELETE, "User was not deleted ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
@@ -110,9 +128,11 @@ fun Route.userController(userService: ICommonServices<User>) {
     ) { _, user: User ->
         try {
             //val user: User = call.receive<User>()
+            observer.onEvent(UPDATE, "User was edited")
             userService.update(user)
             call.respond(HttpStatusCode.OK, user)
         } catch (ex: DataException) {
+            observer.onEvent(UPDATE, "User wasn't edited ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }

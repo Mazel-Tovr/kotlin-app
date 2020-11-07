@@ -39,7 +39,11 @@ class ChatClient {
         )
         {
 
-            print("Enter nick name: ")
+            println("Enter nick name and event you want to subscribe (By default all) ")
+            println("For example nickname: Sanya \nEvents: (read,create,delete,update) or nothing to all ")
+            print("Enter nickname: ")
+            this.send(Frame.Text(readLine() ?: ""))
+            print("Enter events: ")
             this.send(Frame.Text(readLine() ?: ""))
             launch {
                 while (true) {

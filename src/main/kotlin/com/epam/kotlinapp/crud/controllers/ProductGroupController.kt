@@ -4,6 +4,8 @@ import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
+import com.epam.kotlinapp.crud.listener.Event.*
+import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.model.ProductGroup
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.Group
@@ -21,23 +23,28 @@ private val productGroupExample = mapOf(
 )
 
 
+@KtorExperimentalLocationsAPI
 @Group("Product group operations")
 @Location(path.plus("/{id}"))
 class productGroup(val id: Long)
 
+@KtorExperimentalLocationsAPI
 @Group("Product group operations")
 @Location(path)
 class productGroups
 
+@KtorExperimentalLocationsAPI
 @Group("Product group operations")
 @Location(path.plus("/all"))
 class productGroupGeneric
 
 
-fun Route.productGroupController(productGroupService: ICommonServices<ProductGroup>) {
+@KtorExperimentalLocationsAPI
+fun Route.productGroupController(productGroupService: ICommonServices<ProductGroup>, observer: IObserver) {
 
 
     get<productGroupGeneric>("all".responds(ok<Model<ProductGroup>>())) {
+        observer.onEvent(READ, "Getting all product groups")
         call.respond(HttpStatusCode.OK, productGroupService.getAll())
     }
 
@@ -51,11 +58,15 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             val entity = productGroupService.getEntity(id)
-            if (entity != null)
+            if (entity != null) {
+                observer.onEvent(READ, "Getting product group with id = $id")
                 call.respond(HttpStatusCode.OK, entity)
-            else
+            } else {
+                observer.onEvent(READ, "Getting product group with id = $id but something went wrong")
                 call.respond(HttpStatusCode.BadRequest, "")
+            }
         } catch (ex: ProductNotFoundException) {
+            observer.onEvent(READ, "Trying to get product group by id but ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
@@ -74,11 +85,15 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
         val productGroup = productGroupService.create(entity)
         try {
-            if (productGroup != null)
+            if (productGroup != null) {
+                observer.onEvent(CREATE, "Creating new product group $productGroup")
                 call.respond(HttpStatusCode.Created, productGroup)
-            else
+            } else {
+                observer.onEvent(CREATE, "Product was not created")
                 call.respond(HttpStatusCode.BadRequest, "")
+            }
         } catch (ex: DataException) {
+            observer.onEvent(CREATE, "Product was not created ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
@@ -92,14 +107,16 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         try {
             val id: Long = call.parameters["id"]!!.toLong()
             productGroupService.delete(id)
+            observer.onEvent(DELETE, "Product was deleted")
             call.respond(HttpStatusCode.OK, "Product group successfully removed")
         } catch (ex: DataException) {
+            observer.onEvent(DELETE, "Product was not deleted ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
     put<productGroups, ProductGroup>(
         "update"
-            .description("Update produt group in db (by his id)")
+            .description("Update product group in db (by his id)")
             .examples(
                 example("Group", productGroupExample, summary = "super group")
             ).responds(
@@ -109,8 +126,10 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
     ) { _, productGroup: ProductGroup ->
         try {
             productGroupService.update(productGroup)
+            observer.onEvent(UPDATE, "Product group  was edited")
             call.respond(HttpStatusCode.OK, productGroup)
         } catch (ex: DataException) {
+            observer.onEvent(UPDATE, "Product group  wasn't edited ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
     }
