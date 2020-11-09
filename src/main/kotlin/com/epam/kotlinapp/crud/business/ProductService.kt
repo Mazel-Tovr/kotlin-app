@@ -14,10 +14,10 @@ object ProductService : ICommonServices<Product> {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val productOperations: ICommonOperations<Product> = ProductOperations
 
-    override fun create(entity: Product): Product? {
+    override fun create(entity: Product): Product {
         var create: Product? = null
         try {
-            create = productOperations.create(entity);
+            create = productOperations.create(entity)
             logger.info("Product added")
         } catch (ex: SQLException) {
             logger.error(ex.message)
@@ -25,10 +25,10 @@ object ProductService : ICommonServices<Product> {
         return create ?: throw DataException("Product couldn't be created")
     }
 
-    override fun getEntity(id: Long): Product? {
-        var product: Product? = null;
+    override fun getEntity(id: Long): Product {
+        var product: Product? = null
         try {
-            product = productOperations.getEntity(id);
+            product = productOperations.getEntity(id)
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
@@ -37,11 +37,11 @@ object ProductService : ICommonServices<Product> {
 
     override fun getAll(): List<Product> {
         try {
-            return productOperations.getAll();
+            return productOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return emptyList();
+        return emptyList()
     }
 
     override fun update(entity: Product) {

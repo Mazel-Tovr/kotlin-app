@@ -5,8 +5,6 @@ import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.listener.SubscriptionStorage
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
@@ -24,14 +22,14 @@ class Server : IObserver {
 
     private val usersSubscriptionStorage: SubscriptionStorage = SubscriptionStorage()
 
-    private val mapOfUsers: MutableMap<User, WebSocketSession> = ConcurrentHashMap();
+    private val mapOfUsers: MutableMap<User, WebSocketSession> = ConcurrentHashMap()
 
-    private val countOfUsers = AtomicInteger();
+    private val countOfUsers = AtomicInteger()
 
-    private val messages = ConcurrentLinkedQueue<String>();
+    private val messages = ConcurrentLinkedQueue<String>()
 
     init {
-        countOfUsers.set(0);
+        countOfUsers.set(0)
     }
 
     suspend fun joinToServer(
@@ -58,11 +56,11 @@ class Server : IObserver {
     }
 
     suspend fun userLeftServer(user: User, webSocketSession: WebSocketSession) {
-        mapOfUsers[user]!!.close() //TODO FIX THIS
         mapOfUsers.remove(user)
+        webSocketSession.close()
         usersSubscriptionStorage.removeUserFromEveryEvent(user)
-        sendToAll(serverName, "User ${user.name} left chat");
-        sendToAll(serverName, " Users online : ${countOfUsers.decrementAndGet()}")
+        sendToAll(serverName, "User ${user.name} left chat")
+        sendToAll(serverName, "Users online : ${countOfUsers.decrementAndGet()}")
     }
 
     suspend fun sendMessage(user: User, message: String) {
@@ -96,7 +94,9 @@ class Server : IObserver {
             val ws = mapOfUsers[user] ?: throw WebSocketException("Session was closed")
             sentToCurrentUser(message, ws)
         }
-
+//        allUserByEvent.filter { mapOfUsers[it] != null }.forEach {
+//            sentToCurrentUser(message, mapOfUsers[it]!!)
+//        }
 
     }
 

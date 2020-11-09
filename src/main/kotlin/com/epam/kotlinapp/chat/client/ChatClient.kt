@@ -1,28 +1,28 @@
 package com.epam.kotlinapp.chat.client
 
-import com.epam.kotlinapp.chat.server.User
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.consumeEach
-import java.lang.Exception
-import kotlin.concurrent.thread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
+@KtorExperimentalAPI
+@ExperimentalCoroutinesApi
 suspend fun main() {
     ChatClient().main()
 }
 
 class ChatClient {
 
-    val exitWord = "exit"
-    val host = "127.0.0.1"
-    val port = 8080
-    val wsPath = "/ws"
+    private val exitWord = "exit"
+    private val host = "127.0.0.1"
+    private val port = 8080
+    private val wsPath = "/ws"
 
     @KtorExperimentalAPI
     val client = HttpClient {
@@ -30,6 +30,7 @@ class ChatClient {
     }
 
 
+    @KtorExperimentalAPI
     @ExperimentalCoroutinesApi
     private suspend fun createSession() {
         client.ws(
@@ -63,6 +64,7 @@ class ChatClient {
     }
 
 
+    @KtorExperimentalAPI
     @ExperimentalCoroutinesApi
     suspend fun main() {
         createSession()

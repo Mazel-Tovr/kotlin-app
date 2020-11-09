@@ -17,9 +17,9 @@ object UserOperations : ICommonOperations<User> {
         prepareStatement.setString(3,entity.password)
         prepareStatement.executeUpdate()
         val resultSet = prepareStatement.generatedKeys
-        resultSet.next();
-        entity.id = resultSet.getLong(1);
-        return entity;
+        resultSet.next()
+        entity.id = resultSet.getLong(1)
+        return entity
     }
 
     override fun getEntity(id: Long): User? {
@@ -44,15 +44,15 @@ object UserOperations : ICommonOperations<User> {
         prepareStatement.setString(2,entity.email)
         prepareStatement.setString(3,entity.password)
         entity.id?.let { prepareStatement.setLong(4, it) }
-        prepareStatement.executeUpdate();
+        prepareStatement.executeUpdate()
     }
 
 
     override fun delete(id: Long) {
         val prepareStatement = conn
             .prepareStatement("DELETE FROM USER WHERE id = ?")
-        prepareStatement.setLong(1,id);
-        prepareStatement.executeUpdate();
+        prepareStatement.setLong(1,id)
+        prepareStatement.executeUpdate()
     }
 
     override fun getAll(): List<User> {
@@ -69,6 +69,6 @@ object UserOperations : ICommonOperations<User> {
             )
 
         }
-        return userList;
+        return userList
     }
 }

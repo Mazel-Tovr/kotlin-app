@@ -15,9 +15,9 @@ object ProductGroupOperations : ICommonOperations<ProductGroup> {
         prepareStatement.setString(1, entity.groupName)
         prepareStatement.executeUpdate()
         val resultSet = prepareStatement.generatedKeys
-        resultSet.next();
-        entity.id = resultSet.getLong(1);
-        return entity;
+        resultSet.next()
+        entity.id = resultSet.getLong(1)
+        return entity
     }
 
     override fun getEntity(id: Long): ProductGroup? {
@@ -39,15 +39,15 @@ object ProductGroupOperations : ICommonOperations<ProductGroup> {
                 .prepareStatement("UPDATE PRODUCT_GROUP SET group_name=? WHERE id=?")
         prepareStatement.setString(1, entity.groupName)
         entity.id?.let { prepareStatement.setLong(2, it) }
-        prepareStatement.executeUpdate();
+        prepareStatement.executeUpdate()
     }
 
 
     override fun delete(id: Long) {
         val prepareStatement = conn
                 .prepareStatement("DELETE FROM PRODUCT_GROUP WHERE id = ?")
-        prepareStatement.setLong(1, id);
-        prepareStatement.executeUpdate();
+        prepareStatement.setLong(1, id)
+        prepareStatement.executeUpdate()
     }
 
     override fun getAll(): List<ProductGroup> {

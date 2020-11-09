@@ -26,6 +26,7 @@ import kotlin.reflect.jvm.isAccessible
 
 
 //Server for testing
+@KtorExperimentalLocationsAPI
 fun Application.main() {
 
     val server = Server()
@@ -50,9 +51,9 @@ fun Application.main() {
 
 
     routing {
-        this.userController(UserService)
-        this.productController(ProductService)
-        this.productGroupController(ProductGroupService)
+        this.userController(UserService,server)
+        this.productController(ProductService,server)
+        this.productGroupController(ProductGroupService,server)
         this.webSocket(server)
     }
 }

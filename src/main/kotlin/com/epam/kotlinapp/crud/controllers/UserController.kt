@@ -57,16 +57,17 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
         )
     ) {
         try {
-            val id: Long = call.parameters["id"]!!.toLong()
+            val paramId = call.parameters["id"]
+            if (paramId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@get
+            }
+            val id: Long = paramId.toLong()
             val entity = userService.getEntity(id)
-            if (entity != null) {
-                observer.onEvent(READ, "Getting user with id = $id")
-                call.respond(HttpStatusCode.OK, entity)
-            }
-            else {
-                observer.onEvent(READ, "Getting user with id = $id but something went wrong")
-                call.respond(HttpStatusCode.BadRequest, "")
-            }
+
+            observer.onEvent(READ, "Getting user with id = $id")
+            call.respond(HttpStatusCode.OK, entity)
+
         } catch (ex: UserNotFoundException) {
             observer.onEvent(READ, "Trying to get user by id but ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
@@ -85,15 +86,11 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             )
     ) { _, entity: User ->
         try {
-            val user = userService.create(entity);
-            if (user!= null) {
-                observer.onEvent(CREATE, "Creating new user $user")
-                call.respond(HttpStatusCode.Created, user)
-            }
-            else {
-                observer.onEvent(CREATE, "User wasn't created")
-                call.respond(HttpStatusCode.BadRequest, "")
-            }
+            val user = userService.create(entity)
+
+            observer.onEvent(CREATE, "Creating new user $user")
+            call.respond(HttpStatusCode.Created, user)
+
         } catch (ex: DataException) {
             observer.onEvent(CREATE, "User wasn't created ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
@@ -107,7 +104,12 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
         )
     ) {
         try {
-            val id: Long = call.parameters["id"]!!.toLong()
+            val paramId = call.parameters["id"]
+            if (paramId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@delete
+            }
+            val id: Long = paramId.toLong()
             userService.delete(id)
             observer.onEvent(DELETE, "User was deleted")
             call.respond(HttpStatusCode.OK, "User successfully removed")
@@ -127,7 +129,6 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             )
     ) { _, user: User ->
         try {
-            //val user: User = call.receive<User>()
             observer.onEvent(UPDATE, "User was edited")
             userService.update(user)
             call.respond(HttpStatusCode.OK, user)

@@ -56,15 +56,18 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
     )
     {
         try {
-            val id: Long = call.parameters["id"]!!.toLong()
-            val entity = productGroupService.getEntity(id)
-            if (entity != null) {
-                observer.onEvent(READ, "Getting product group with id = $id")
-                call.respond(HttpStatusCode.OK, entity)
-            } else {
-                observer.onEvent(READ, "Getting product group with id = $id but something went wrong")
-                call.respond(HttpStatusCode.BadRequest, "")
+            val paramId = call.parameters["id"]
+            if (paramId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@get
             }
+            val id: Long = paramId.toLong()
+
+            val entity = productGroupService.getEntity(id)
+
+            observer.onEvent(READ, "Getting product group with id = $id")
+            call.respond(HttpStatusCode.OK, entity)
+
         } catch (ex: ProductNotFoundException) {
             observer.onEvent(READ, "Trying to get product group by id but ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
@@ -85,13 +88,10 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
         val productGroup = productGroupService.create(entity)
         try {
-            if (productGroup != null) {
-                observer.onEvent(CREATE, "Creating new product group $productGroup")
-                call.respond(HttpStatusCode.Created, productGroup)
-            } else {
-                observer.onEvent(CREATE, "Product was not created")
-                call.respond(HttpStatusCode.BadRequest, "")
-            }
+
+            observer.onEvent(CREATE, "Creating new product group $productGroup")
+            call.respond(HttpStatusCode.Created, productGroup)
+
         } catch (ex: DataException) {
             observer.onEvent(CREATE, "Product was not created ${ex.message}")
             call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
@@ -105,7 +105,12 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         )
     ) {
         try {
-            val id: Long = call.parameters["id"]!!.toLong()
+            val paramId = call.parameters["id"]
+            if (paramId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@delete
+            }
+            val id: Long = paramId.toLong()
             productGroupService.delete(id)
             observer.onEvent(DELETE, "Product was deleted")
             call.respond(HttpStatusCode.OK, "Product group successfully removed")

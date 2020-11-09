@@ -14,10 +14,10 @@ object UserService : ICommonServices<User> {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val userOperations: ICommonOperations<User> = UserOperations
 
-    override fun create(entity: User): User? {
-        var user: User? = null;
+    override fun create(entity: User): User {
+        var user: User? = null
         try {
-            user = userOperations.create(entity);
+            user = userOperations.create(entity)
             logger.info("User added")
         } catch (ex: SQLException) {
             logger.error(ex.message)
@@ -25,7 +25,7 @@ object UserService : ICommonServices<User> {
         return user ?: throw DataException("User couldn't be created")
     }
 
-    override fun getEntity(id: Long): User? {
+    override fun getEntity(id: Long): User {
         var user: User? = null
         try {
             user = userOperations.getEntity(id)
@@ -37,9 +37,9 @@ object UserService : ICommonServices<User> {
     }
 
     override fun getAll(): List<User> {
-        var list: List<User> = emptyList();
+        var list: List<User> = emptyList()
         try {
-            list = userOperations.getAll();
+            list = userOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }

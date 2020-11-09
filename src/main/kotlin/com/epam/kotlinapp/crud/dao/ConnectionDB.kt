@@ -11,8 +11,8 @@ internal object ConnectionDB {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    private val username = "sa"
-    private val password = ""
+    private const val username = "sa"
+    private const val password = ""
     lateinit var conn: Connection
     private val path: String = "jdbc:h2:".plus(System.getProperty("user.dir")).plus("\\db\\db")
 
@@ -20,7 +20,7 @@ internal object ConnectionDB {
     init {
         try {
             logger.info("Connecting to Database")
-            Class.forName("org.h2.Driver");
+            Class.forName("org.h2.Driver")
             conn = DriverManager.getConnection(path, username, password)
             logger.info("Connection is established")
         } catch (ex: SQLException) {
