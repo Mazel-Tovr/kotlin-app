@@ -15,7 +15,7 @@ fun Route.webSocket(server: Server) {
             input = incoming.receive()
             val eventList = if (input is Frame.Text) input.readText() else ""
             if (userName != "" && server.isNickNameFree(userName)) {
-                val user = User(userName)
+                val user = Session(userName)
                 server.joinToServer(user, this,eventList.parseToEventsList())
                 try {
                     while (true) {

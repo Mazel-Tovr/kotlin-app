@@ -14,6 +14,7 @@ import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 
 private const val path: String = "/product"
 
@@ -110,23 +111,32 @@ fun Route.productController(productService: ICommonServices<Product>, observer: 
                 notFound()
             )
     ) {
-        try {
-            val paramId = call.parameters["id"]
-            if (paramId == null) {
+        val id: Long = call.parameters["id"].let { param ->
+            if (param == null) {
                 call.respond(HttpStatusCode.BadRequest, "Id isn't present")
                 return@delete
+            } else {
+                param.toLong()
             }
-            val id: Long = paramId.toLong()
-
-            productService.delete(id)
-
-            observer.onEvent(DELETE, "Product was deleted")
-            call.respond(HttpStatusCode.OK, "Product successfully removed")
-
-        } catch (ex: DataException) {
-            observer.onEvent(DELETE, "Product was not deleted ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
+        kotlin.runCatching { productService.delete(id) }
+            .onSuccess {
+                observer.onEvent(DELETE, "Product was deleted")
+                call.respond(HttpStatusCode.OK, "Product successfully removed")
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(DELETE, "Product wasn't deleted ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+
+            }
     }
     put<products, Product>(
         "update".description("Update product in db (by his id)")

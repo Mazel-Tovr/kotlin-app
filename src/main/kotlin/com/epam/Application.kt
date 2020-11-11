@@ -6,8 +6,8 @@ import com.epam.kotlinapp.crud.business.ProductGroupService
 import com.epam.kotlinapp.crud.business.ProductService
 import com.epam.kotlinapp.crud.business.UserService
 import com.epam.kotlinapp.crud.controllers.productController
-import com.epam.kotlinapp.crud.controllers.userController
 import com.epam.kotlinapp.crud.controllers.productGroupController
+import com.epam.kotlinapp.crud.controllers.userController
 import de.nielsfalk.ktor.swagger.SwaggerSupport
 import de.nielsfalk.ktor.swagger.version.shared.Contact
 import de.nielsfalk.ktor.swagger.version.shared.Information
@@ -15,9 +15,9 @@ import de.nielsfalk.ktor.swagger.version.v2.Swagger
 import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
@@ -32,12 +32,9 @@ fun main() {
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
 
         install(DefaultHeaders)
-//        install(Compression)
         install(CallLogging)
         install(ContentNegotiation) {
-            gson {
-                setPrettyPrinting()
-            }
+            json()
         }
         install(Locations)
         install(SwaggerSupport) {
@@ -51,9 +48,11 @@ fun main() {
                     url = "https://nielsfalk.de"
                 )
             )
+
             swagger = Swagger().apply {
                 info = information
             }
+
             openApi = OpenApi().apply {
                 info = information
             }
@@ -72,3 +71,4 @@ fun main() {
         }
     }.start(wait = true)
 }
+

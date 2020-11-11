@@ -56,23 +56,35 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             notFound()
         )
     ) {
-        try {
-            val paramId = call.parameters["id"]
-            if (paramId == null) {
+
+        val id: Long = call.parameters["id"].let { param ->
+            if (param == null) {
                 call.respond(HttpStatusCode.BadRequest, "Id isn't present")
                 return@get
+            } else {
+                param.toLong()
             }
-            val id: Long = paramId.toLong()
-            val entity = userService.getEntity(id)
-
-            observer.onEvent(READ, "Getting user with id = $id")
-            call.respond(HttpStatusCode.OK, entity)
-
-        } catch (ex: UserNotFoundException) {
-            observer.onEvent(READ, "Trying to get user by id but ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
+
+        kotlin.runCatching { userService.getEntity(id) }
+            .onSuccess { user ->
+                observer.onEvent(READ, "Getting user with id = $id")
+                call.respond(HttpStatusCode.OK, user)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(READ, "Trying to get user by id but ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                    }
+                    else -> {
+                        observer.onEvent(READ, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
+
     post<users, User>(
         "create"
             .description("Add new user to date base")
@@ -103,21 +115,35 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             notFound()
         )
     ) {
-        try {
-            val paramId = call.parameters["id"]
-            if (paramId == null) {
+
+        val id: Long = call.parameters["id"].let { param ->
+            if (param == null) {
                 call.respond(HttpStatusCode.BadRequest, "Id isn't present")
                 return@delete
+            } else {
+                param.toLong()
             }
-            val id: Long = paramId.toLong()
-            userService.delete(id)
-            observer.onEvent(DELETE, "User was deleted")
-            call.respond(HttpStatusCode.OK, "User successfully removed")
-        } catch (ex: DataException) {
-            observer.onEvent(DELETE, "User was not deleted ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
+        kotlin.runCatching { userService.delete(id) }
+            .onSuccess {
+                observer.onEvent(DELETE, "User was deleted")
+                call.respond(HttpStatusCode.OK, "User successfully removed")
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(DELETE, "User wasn't deleted ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+
+            }
     }
+
     put<users, User>(
         "update"
             .description("Update user in db (by his id)")
@@ -138,3 +164,4 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
         }
     }
 }
+

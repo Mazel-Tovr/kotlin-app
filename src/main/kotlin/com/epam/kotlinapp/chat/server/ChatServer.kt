@@ -5,12 +5,17 @@ import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.listener.SubscriptionStorage
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.persistentHashMapOf
+import kotlinx.collections.immutable.persistentListOf
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Function
 
-//data class User(val name: String, val eventsList: List<Events>)
-data class User(val name: String)
+
+data class Session(val id: String)
 
 class Server : IObserver {
 
@@ -20,28 +25,30 @@ class Server : IObserver {
 
     // private val listOfListeners:MutableMap<Event,IObserver> = mutableMapOf();
 
-    private val usersSubscriptionStorage: SubscriptionStorage = SubscriptionStorage()
+    private val sessionSubscriptionStorage: SubscriptionStorage = SubscriptionStorage()
 
-    private val mapOfUsers: MutableMap<User, WebSocketSession> = ConcurrentHashMap()
+    private val mapOfUsers: PersistentMap<Session, WebSocketSession> = persistentHashMapOf()
 
     private val countOfUsers = AtomicInteger()
 
-    private val messages = ConcurrentLinkedQueue<String>()
+    private val messages = persistentListOf<String>()
 
     init {
         countOfUsers.set(0)
     }
 
     suspend fun joinToServer(
-        user: User,
+        session: Session,
         webSocketSession: WebSocketSession,
         eventList: List<Event> = Event.values().toList()
     ) {
         //if user is absent
-        val newSession = mapOfUsers.computeIfAbsent(user) { webSocketSession }
+        //val newSession = mapOfUsers.computeIfAbsent(session) { webSocketSession }
+        mapOfUsers.put(session,webSocketSession)
+        val newSession = mapOfUsers[session]!!//TODO REWRITE
 
         //subscribe user to events all by default
-        eventList.forEach { event -> usersSubscriptionStorage.addUserToEvent(user, event) }
+        eventList.forEach { event -> sessionSubscriptionStorage.addUserToEvent(session, event) }
 
 
         //send all message to new user
@@ -49,30 +56,30 @@ class Server : IObserver {
             newSession.send(Frame.Text(message))
         }
 
-        sendToAll(serverName, "New user in the chat: ${user.name}")
+        sendToAll(serverName, "New user in the chat: ${session.id}")
         sendToAll(serverName, "Users online : ${countOfUsers.incrementAndGet()}")
 
-        sentToCurrentUser("You are subscribe to this REST events $eventList",newSession)
+        sentToCurrentUser("You are subscribe to this REST events $eventList", newSession)
     }
 
-    suspend fun userLeftServer(user: User, webSocketSession: WebSocketSession) {
-        mapOfUsers.remove(user)
+    suspend fun userLeftServer(session: Session, webSocketSession: WebSocketSession) {
+        mapOfUsers.remove(session)
         webSocketSession.close()
-        usersSubscriptionStorage.removeUserFromEveryEvent(user)
-        sendToAll(serverName, "User ${user.name} left chat")
+        sessionSubscriptionStorage.removeUserFromEveryEvent(session)
+        sendToAll(serverName, "User ${session.id} left chat")
         sendToAll(serverName, "Users online : ${countOfUsers.decrementAndGet()}")
     }
 
-    suspend fun sendMessage(user: User, message: String) {
-        sendToAll(user.name, message)
+    suspend fun sendMessage(session: Session, message: String) {
+        sendToAll(session.id, message)
 
-        messages += if (messages.size < 9) {
-            "<${user.name}> $message"
+        messages.add( if (messages.size < 9) {
+            "<${session.id}> $message"
         } else {
-            messages.remove()
-            "<${user.name}> $message"
+            messages.removeAt(0)
+            "<${session.id}> $message"
         }
-
+        )
 
     }
 
@@ -84,11 +91,11 @@ class Server : IObserver {
         webSocketSession.send(Frame.Text("<$serverName> REST: $message"))
     }
 
-    fun isNickNameFree(name: String): Boolean = mapOfUsers[User(name)] == null
+    fun isNickNameFree(name: String): Boolean = mapOfUsers[Session(name)] == null
 
 
     override suspend fun onEvent(event: Event, message: String) {
-        val allUserByEvent = usersSubscriptionStorage.getAllUserByEvent(event)
+        val allUserByEvent = sessionSubscriptionStorage.getAllUserByEvent(event)
 
         allUserByEvent.forEach { user ->
             val ws = mapOfUsers[user] ?: throw WebSocketException("Session was closed")
@@ -99,6 +106,18 @@ class Server : IObserver {
 //        }
 
     }
+
+//    private fun <K, V> PersistentMap<K, V>.computeIfAbsent(key: K, mappingFunction: (K)->V): V {
+//
+//        var v: V? = this[key]
+//        if (v == null) {
+//            var newValue: V
+//            mappingFunction.apply { this@computeIfAbsent.put(key,)}
+//
+//        }
+//        return v
+//    }
+
 
 
 }

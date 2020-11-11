@@ -5,6 +5,8 @@ import com.epam.kotlinapp.crud.dao.UserOperations
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.User
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -29,21 +31,19 @@ object UserService : ICommonServices<User> {
         var user: User? = null
         try {
             user = userOperations.getEntity(id)
-
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
         return user ?: throw UserNotFoundException("User with id = $id couldn't found")
     }
 
-    override fun getAll(): List<User> {
-        var list: List<User> = emptyList()
+    override fun getAll(): ImmutableList<User> {
         try {
-            list = userOperations.getAll()
+            return userOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return list
+        return persistentListOf()
     }
 
     override fun update(entity: User) {

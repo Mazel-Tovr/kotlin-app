@@ -5,6 +5,8 @@ import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.model.Product
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -35,13 +37,13 @@ object ProductService : ICommonServices<Product> {
         return product ?: throw ProductNotFoundException("Product with id = $id couldn't found")
     }
 
-    override fun getAll(): List<Product> {
+    override fun getAll(): ImmutableList<Product> {
         try {
             return productOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return emptyList()
+        return persistentListOf()
     }
 
     override fun update(entity: Product) {

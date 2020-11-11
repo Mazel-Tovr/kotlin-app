@@ -104,20 +104,34 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             notFound()
         )
     ) {
-        try {
-            val paramId = call.parameters["id"]
-            if (paramId == null) {
+
+        val id: Long = call.parameters["id"].let { param ->
+            if (param == null) {
                 call.respond(HttpStatusCode.BadRequest, "Id isn't present")
                 return@delete
+            } else {
+                param.toLong()
             }
-            val id: Long = paramId.toLong()
-            productGroupService.delete(id)
-            observer.onEvent(DELETE, "Product was deleted")
-            call.respond(HttpStatusCode.OK, "Product group successfully removed")
-        } catch (ex: DataException) {
-            observer.onEvent(DELETE, "Product was not deleted ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
+
+        kotlin.runCatching { productGroupService.delete(id) }
+            .onSuccess {
+                observer.onEvent(DELETE, "Product was deleted")
+                call.respond(HttpStatusCode.OK, "Product group successfully removed")
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(DELETE, "Product wasn't deleted ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+
+            }
     }
     put<productGroups, ProductGroup>(
         "update"

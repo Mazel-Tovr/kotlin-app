@@ -5,6 +5,8 @@ import com.epam.kotlinapp.crud.dao.ProductGroupOperations
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
 import com.epam.kotlinapp.crud.model.ProductGroup
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -36,13 +38,13 @@ object ProductGroupService : ICommonServices<ProductGroup> {
 
     }
 
-    override fun getAll(): List<ProductGroup> {
+    override fun getAll(): ImmutableList<ProductGroup> {
         try {
             return productGroupOperations.getAll()
         } catch (ex: SQLException) {
             logger.error(ex.message)
         }
-        return emptyList()
+        return persistentListOf()
     }
 
     override fun update(entity: ProductGroup) {

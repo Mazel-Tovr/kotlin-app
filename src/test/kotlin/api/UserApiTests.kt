@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.locations.*
 import io.ktor.server.testing.*
 import main
 import java.lang.reflect.Type
@@ -12,7 +13,7 @@ import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
+@KtorExperimentalLocationsAPI
 class UserApiTests {
 
     private val url: String = "/user"

@@ -1,37 +1,34 @@
 package com.epam.kotlinapp.crud.listener
 
-import com.epam.kotlinapp.chat.server.User
+import com.epam.kotlinapp.chat.server.Session
+import kotlinx.collections.immutable.*
 
 class SubscriptionStorage {
-    private val listOfEvents: Map<Event, MutableList<User>> = mapOf(
-        Event.CREATE to mutableListOf(),
-        Event.READ to mutableListOf(),
-        Event.UPDATE to mutableListOf(),
-        Event.DELETE to mutableListOf()
+    private val listOfEvents: ImmutableMap<Event, PersistentList<Session>> = persistentMapOf(
+        Event.CREATE to persistentListOf(),
+        Event.READ to persistentListOf(),
+        Event.UPDATE to persistentListOf(),
+        Event.DELETE to persistentListOf()
     );
 
 
-    fun addUserToEvent(user: User, event: Event) {
-        if (listOfEvents.containsKey(event))
-            listOfEvents[event]?.add(user)
-        else
-            throw IllegalArgumentException("This event \"$event\" is not supported")
+    fun addUserToEvent(session: Session, event: Event) {
+        listOfEvents[event]?.add(session)
+            ?: throw IllegalArgumentException("This event \"$event\" is not supported")
     }
 
-    fun removeUserFromEvent(user: User, event: Event) {
-        if (listOfEvents.containsKey(event))
-            listOfEvents[event]?.remove(user)
-        else
-            throw IllegalArgumentException("This event \"$event\" is not supported")
+    fun removeUserFromEvent(session: Session, event: Event) {
+        listOfEvents[event]?.remove(session)
+            ?: throw IllegalArgumentException("This event \"$event\" is not supported")
     }
 
-    fun removeUserFromEveryEvent(user: User) {
-        listOfEvents.values.forEach { list -> list.remove(user) }
+    fun removeUserFromEveryEvent(session: Session) {
+        listOfEvents.values.forEach { list -> list.remove(session) }
     }
 
-    fun getAllUserByEvent(event: Event): MutableList<User> {
+    fun getAllUserByEvent(event: Event): PersistentList<Session> {
         if (listOfEvents.containsKey(event))
-            return listOfEvents[event] ?: mutableListOf()
+            return listOfEvents[event] ?: persistentListOf()
         else
             throw IllegalArgumentException("This event \"$event\" is not supported")
 

@@ -12,13 +12,16 @@ import com.epam.kotlinapp.crud.dao.ProductGroupOperations
 import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.dao.UserOperations
 import de.nielsfalk.ktor.swagger.SwaggerSupport
+import de.nielsfalk.ktor.swagger.json
 import de.nielsfalk.ktor.swagger.version.v2.Swagger
 import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.websocket.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
@@ -35,9 +38,7 @@ fun Application.main() {
     install(CallLogging)
     install(Locations)
     install(ContentNegotiation) {
-        gson {
-            setPrettyPrinting()
-        }
+        json()
     }
     install(SwaggerSupport) {
         swagger = Swagger().apply {}
