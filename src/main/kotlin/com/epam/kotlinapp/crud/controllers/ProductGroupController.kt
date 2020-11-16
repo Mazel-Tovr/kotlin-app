@@ -3,6 +3,7 @@ package com.epam.kotlinapp.crud.controllers
 import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.exceptions.DataException
+import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
 import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.listener.Event.*
 import com.epam.kotlinapp.crud.listener.IObserver
@@ -55,23 +56,31 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
         )
     )
     {
-        try {
-            val paramId = call.parameters["id"]
-            if (paramId == null) {
+        val id: Long = call.parameters["id"].let { param ->
+            if (param == null) {
                 call.respond(HttpStatusCode.BadRequest, "Id isn't present")
                 return@get
+            } else {
+                param.toLong()
             }
-            val id: Long = paramId.toLong()
-
-            val entity = productGroupService.getEntity(id)
-
-            observer.onEvent(READ, "Getting product group with id = $id")
-            call.respond(HttpStatusCode.OK, entity)
-
-        } catch (ex: ProductNotFoundException) {
-            observer.onEvent(READ, "Trying to get product group by id but ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
         }
+        kotlin.runCatching { productGroupService.getEntity(id) }
+            .onSuccess { product ->
+                observer.onEvent(READ, "Getting product with id = $id")
+                call.respond(HttpStatusCode.OK, product)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is ProductGroupNotFoundException -> {
+                        observer.onEvent(READ, "Trying to get product by id but ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "Trying to get product by id but ${exception.message}")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
     post<productGroups, ProductGroup>(
         "create"
@@ -86,16 +95,23 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             )
     ) { _, entity: ProductGroup ->
 
-        val productGroup = productGroupService.create(entity)
-        try {
-
-            observer.onEvent(CREATE, "Creating new product group $productGroup")
-            call.respond(HttpStatusCode.Created, productGroup)
-
-        } catch (ex: DataException) {
-            observer.onEvent(CREATE, "Product was not created ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-        }
+        kotlin.runCatching { productGroupService.create(entity) }
+            .onSuccess { product ->
+                observer.onEvent(CREATE, "Creating new product group $product")
+                call.respond(HttpStatusCode.Created, product)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(CREATE, "Product group wasn't created ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "Product group wasn't created ${exception.message}")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
 
     delete<productGroup>(
@@ -116,14 +132,14 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
         kotlin.runCatching { productGroupService.delete(id) }
             .onSuccess {
-                observer.onEvent(DELETE, "Product was deleted")
+                observer.onEvent(DELETE, "Product group was deleted")
                 call.respond(HttpStatusCode.OK, "Product group successfully removed")
             }
             .onFailure { exception ->
                 when (exception) {
                     is DataException -> {
-                        observer.onEvent(DELETE, "Product wasn't deleted ${exception.message}")
-                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                        observer.onEvent(DELETE, "Product group wasn't deleted ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "Product group wasn't deleted ${exception.message}")
                     }
                     else -> {
                         observer.onEvent(DELETE, "Server exception ${exception.message}")
@@ -143,14 +159,23 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 notFound()
             )
     ) { _, productGroup: ProductGroup ->
-        try {
-            productGroupService.update(productGroup)
-            observer.onEvent(UPDATE, "Product group  was edited")
-            call.respond(HttpStatusCode.OK, productGroup)
-        } catch (ex: DataException) {
-            observer.onEvent(UPDATE, "Product group  wasn't edited ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-        }
+        kotlin.runCatching { productGroupService.update(productGroup) }
+            .onSuccess {
+                observer.onEvent(UPDATE, "Product group was edited")
+                call.respond(HttpStatusCode.OK, productGroup)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(UPDATE, "Product group wasn't edited ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "Product group wasn't edited ${exception.message}")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
 
 }

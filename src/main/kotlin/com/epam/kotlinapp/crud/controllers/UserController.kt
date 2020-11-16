@@ -73,9 +73,9 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             }
             .onFailure { exception ->
                 when (exception) {
-                    is DataException -> {
+                    is UserNotFoundException -> {
                         observer.onEvent(READ, "Trying to get user by id but ${exception.message}")
-                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                        call.respond(HttpStatusCode.BadRequest, "Trying to get user by id but ${exception.message}")
                     }
                     else -> {
                         observer.onEvent(READ, "Server exception ${exception.message}")
@@ -97,16 +97,24 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
                 )
             )
     ) { _, entity: User ->
-        try {
-            val user = userService.create(entity)
 
-            observer.onEvent(CREATE, "Creating new user $user")
-            call.respond(HttpStatusCode.Created, user)
-
-        } catch (ex: DataException) {
-            observer.onEvent(CREATE, "User wasn't created ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-        }
+        kotlin.runCatching { userService.create(entity) }
+            .onSuccess { user ->
+                observer.onEvent(CREATE, "Creating new user $user")
+                call.respond(HttpStatusCode.Created, user)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(CREATE, "User wasn't created ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "User wasn't created ${exception.message}")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
 
     delete<user>(
@@ -133,7 +141,7 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
                 when (exception) {
                     is DataException -> {
                         observer.onEvent(DELETE, "User wasn't deleted ${exception.message}")
-                        call.respond(HttpStatusCode.BadRequest, exception.message ?: "")
+                        call.respond(HttpStatusCode.BadRequest, "User wasn't deleted ${exception.message}")
                     }
                     else -> {
                         observer.onEvent(DELETE, "Server exception ${exception.message}")
@@ -154,14 +162,23 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
                 notFound()
             )
     ) { _, user: User ->
-        try {
-            observer.onEvent(UPDATE, "User was edited")
-            userService.update(user)
-            call.respond(HttpStatusCode.OK, user)
-        } catch (ex: DataException) {
-            observer.onEvent(UPDATE, "User wasn't edited ${ex.message}")
-            call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-        }
+        kotlin.runCatching { userService.update(user) }
+            .onSuccess {
+                observer.onEvent(UPDATE, "User was edited")
+                call.respond(HttpStatusCode.OK, user)
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is DataException -> {
+                        observer.onEvent(UPDATE, "User wasn't edited ${exception.message}")
+                        call.respond(HttpStatusCode.BadRequest, "User wasn't edited ${exception.message}")
+                    }
+                    else -> {
+                        observer.onEvent(DELETE, "Server exception ${exception.message}")
+                        call.respond(HttpStatusCode.InternalServerError, "Server exception ${exception.message}")
+                    }
+                }
+            }
     }
 }
 

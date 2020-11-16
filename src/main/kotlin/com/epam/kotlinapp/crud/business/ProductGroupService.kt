@@ -4,6 +4,7 @@ import com.epam.kotlinapp.crud.dao.ICommonOperations
 import com.epam.kotlinapp.crud.dao.ProductGroupOperations
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
+import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.ProductGroup
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -17,54 +18,47 @@ object ProductGroupService : ICommonServices<ProductGroup> {
     private val productGroupOperations: ICommonOperations<ProductGroup> = ProductGroupOperations
 
     override fun create(entity: ProductGroup): ProductGroup {
-        var create: ProductGroup? = null
-        try {
-            create = productGroupOperations.create(entity)
-            logger.info("ProductGroup group added")
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return create ?: throw DataException("ProductGroup couldn't be created")
+        return kotlin.runCatching { productGroupOperations.create(entity) }
+            .onSuccess { logger.info("Product group added") }
+            .onFailure { logger.error(it.message) }
+            .getOrElse { throw DataException("Product group couldn't be created") }
     }
 
     override fun getEntity(id: Long): ProductGroup {
-        var productGroup: ProductGroup? = null
-        try {
-            productGroup = productGroupOperations.getEntity(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return productGroup ?: throw ProductGroupNotFoundException("ProductGroup with id = $id couldn't found")
+        return kotlin.runCatching { productGroupOperations.getEntity(id) }
+            .onSuccess { logger.info("Getting product group") }
+            .onFailure { logger.error(it.message) }
+            .getOrNull() ?: throw UserNotFoundException("Product group with id = $id couldn't found")
 
     }
 
     override fun getAll(): ImmutableList<ProductGroup> {
-        try {
-            return productGroupOperations.getAll()
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return persistentListOf()
+        return kotlin.runCatching { productGroupOperations.getAll() }
+            .onSuccess { logger.info("Getting product groups") }
+            .onFailure { logger.error(it.message) }
+            .getOrDefault(persistentListOf())
     }
 
     override fun update(entity: ProductGroup) {
-        try {
-            if (entity.id == null || entity.id == 0L)
-                throw DataException("Product group id can't be empty")
-            else productGroupOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (entity.id == null || entity.id == 0L)
+            throw DataException("Product group id can't be empty")
+        kotlin.runCatching { productGroupOperations.update(entity) }
+            .onSuccess { logger.info("Product group updated") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("Product group wasn't updated")
+            }
+
     }
 
-
     override fun delete(id: Long) {
-        try {
-            if (id == 0L)
-                throw DataException("Product group id can't be empty")
-            else productGroupOperations.delete(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (id == 0L)
+            throw DataException("Product group id can't be empty")
+        kotlin.runCatching { productGroupOperations.delete(id) }
+            .onSuccess { logger.info("Product group deleted") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("Product group wasn't deleted")
+            }
     }
 }

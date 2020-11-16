@@ -9,7 +9,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.sql.SQLException
 
 object UserService : ICommonServices<User> {
 
@@ -17,54 +16,50 @@ object UserService : ICommonServices<User> {
     private val userOperations: ICommonOperations<User> = UserOperations
 
     override fun create(entity: User): User {
-        var user: User? = null
-        try {
-            user = userOperations.create(entity)
-            logger.info("User added")
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return user ?: throw DataException("User couldn't be created")
+
+        return kotlin.runCatching { userOperations.create(entity) }
+            .onSuccess { logger.info("User added") }
+            .onFailure { logger.error(it.message) }
+            .getOrElse { throw DataException("User couldn't be created") }
     }
 
     override fun getEntity(id: Long): User {
-        var user: User? = null
-        try {
-            user = userOperations.getEntity(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+
+        val user: User? = kotlin.runCatching { userOperations.getEntity(id) }
+            .onSuccess { logger.info("Getting user") }
+            .onFailure { logger.error(it.message) }
+            .getOrNull()
+
         return user ?: throw UserNotFoundException("User with id = $id couldn't found")
     }
 
     override fun getAll(): ImmutableList<User> {
-        try {
-            return userOperations.getAll()
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return persistentListOf()
+        return kotlin.runCatching { userOperations.getAll() }
+            .onSuccess { logger.info("Getting users") }
+            .onFailure { logger.error(it.message) }
+            .getOrDefault(persistentListOf())
     }
 
     override fun update(entity: User) {
-        try {
-            if (entity.id == null || entity.id == 0L)
-                throw DataException("User id can't be empty")
-            else userOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (entity.id == null || entity.id == 0L)
+            throw DataException("User id can't be empty")
+        kotlin.runCatching { userOperations.update(entity) }
+            .onSuccess { logger.info("User updated") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("User wasn't updated")
+            }
     }
 
-
     override fun delete(id: Long) {
-        try {
-            if (id == 0L)
-                throw DataException("User id can't be empty")
-            else userOperations.delete(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (id == 0L)
+            throw DataException("User id can't be empty")
+        kotlin.runCatching { userOperations.delete(id) }
+            .onSuccess { logger.info("User deleted") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("User wasn't deleted")
+            }
     }
 
 

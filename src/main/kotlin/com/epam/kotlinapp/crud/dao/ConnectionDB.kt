@@ -25,10 +25,8 @@ internal object ConnectionDB {
             logger.info("Connection is established")
         } catch (ex: SQLException) {
             logger.error(ex.message)
-//            ex.printStackTrace()
         } catch (ex: Exception) {
             logger.error(ex.message)
-//            ex.printStackTrace()
         }
     }
 

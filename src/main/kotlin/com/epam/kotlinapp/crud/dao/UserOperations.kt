@@ -8,7 +8,6 @@ import java.sql.Connection
 import java.sql.Statement
 
 object UserOperations : ICommonOperations<User> {
-//    val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     private var conn: Connection = ConnectionDB.conn
 

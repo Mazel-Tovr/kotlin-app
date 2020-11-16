@@ -5,6 +5,7 @@
 build/
 !src/**/build/
 
+distr
 
 gradle-app.setting
 !gradle-wrapper.jar
