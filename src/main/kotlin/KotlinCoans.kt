@@ -1,7 +1,3 @@
-package com.epam
-
-import java.util.*
-import java.util.function.Function
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -129,7 +125,7 @@ fun <T, C : MutableCollection<T>> Collection<T>.partitionTo(first: C, second: C,
 
 fun partitionWordsAndLines() {
     val (words, lines) = listOf("a", "a b", "c", "d e").partitionTo(
-        ArrayList<String>(),
+        ArrayList(),
         ArrayList()
     ) { s -> !s.contains(" ") }
     words == listOf("a", "c")
@@ -138,7 +134,7 @@ fun partitionWordsAndLines() {
 
 fun partitionLettersAndOtherSymbols() {
     val (letters, other) = setOf('a', '%', 'r', '}').partitionTo(
-        HashSet<Char>(),
+        HashSet(),
         HashSet()
     ) { c -> c in 'a'..'z' || c in 'A'..'Z' }
     letters == setOf('a', 'r')

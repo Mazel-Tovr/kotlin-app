@@ -3,7 +3,7 @@ package com.epam.kotlinapp.crud.business
 import com.epam.kotlinapp.crud.dao.ICommonOperations
 import com.epam.kotlinapp.crud.dao.ProductOperations
 import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
+import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
 import com.epam.kotlinapp.crud.model.Product
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -17,52 +17,46 @@ object ProductService : ICommonServices<Product> {
     private val productOperations: ICommonOperations<Product> = ProductOperations
 
     override fun create(entity: Product): Product {
-        var create: Product? = null
-        try {
-            create = productOperations.create(entity)
-            logger.info("Product added")
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return create ?: throw DataException("Product couldn't be created")
+        return kotlin.runCatching { productOperations.create(entity) }
+            .onSuccess { logger.info("Product added") }
+            .onFailure { logger.error(it.message) }
+            .getOrElse { throw DataException("Product couldn't be created") }
     }
 
     override fun getEntity(id: Long): Product {
-        var product: Product? = null
-        try {
-            product = productOperations.getEntity(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return product ?: throw ProductNotFoundException("Product with id = $id couldn't found")
+        return kotlin.runCatching { productOperations.getEntity(id) }
+            .onSuccess { logger.info("Getting product") }
+            .onFailure { logger.error(it.message) }
+            .getOrNull() ?: throw UserNotFoundException("Product with id = $id couldn't found")
+
     }
 
     override fun getAll(): ImmutableList<Product> {
-        try {
-            return productOperations.getAll()
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
-        return persistentListOf()
+        return kotlin.runCatching { productOperations.getAll() }
+            .onSuccess { logger.info("Getting products") }
+            .onFailure { logger.error(it.message) }
+            .getOrDefault(persistentListOf())
     }
 
     override fun update(entity: Product) {
-        try {
-            if (entity.id == null || entity.id == 0L)
-                throw DataException("Product id can't be empty")
-            else productOperations.update(entity)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (entity.id == null || entity.id == 0L)
+            throw DataException("Product id can't be empty")
+        kotlin.runCatching { productOperations.update(entity) }
+            .onSuccess { logger.info("Product updated") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("Product wasn't updated")
+            }
     }
 
     override fun delete(id: Long) {
-        try {
-            if (id == 0L)
-                throw DataException("Product id can't be empty")
-            else productOperations.delete(id)
-        } catch (ex: SQLException) {
-            logger.error(ex.message)
-        }
+        if (id == 0L)
+            throw DataException("Product id can't be empty")
+        kotlin.runCatching { productOperations.delete(id) }
+            .onSuccess { logger.info("Product deleted") }
+            .onFailure {
+                logger.error(it.message)
+                throw DataException("Product wasn't deleted")
+            }
     }
 }

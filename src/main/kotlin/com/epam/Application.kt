@@ -67,7 +67,6 @@ fun main() {
             this.productController(ProductService,server)
             this.productGroupController(ProductGroupService,server)
             this.webSocket(server)
-
         }
     }.start(wait = true)
 }

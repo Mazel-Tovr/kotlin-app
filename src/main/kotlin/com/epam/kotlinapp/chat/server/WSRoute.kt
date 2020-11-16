@@ -8,7 +8,6 @@ import io.ktor.websocket.*
 
 fun Route.webSocket(server: Server) {
     webSocket("/ws") {
-        // i could do better but ... no time on this
         do {
             var input = incoming.receive()
             val userName = if (input is Frame.Text) input.readText() else ""
@@ -16,7 +15,7 @@ fun Route.webSocket(server: Server) {
             val eventList = if (input is Frame.Text) input.readText() else ""
             if (userName != "" && server.isNickNameFree(userName)) {
                 val user = Session(userName)
-                server.joinToServer(user, this,eventList.parseToEventsList())
+                server.joinToServer(user, this, eventList.parseToEventsList())
                 try {
                     while (true) {
                         when (val frame = incoming.receive()) {
@@ -32,7 +31,6 @@ fun Route.webSocket(server: Server) {
                 this.send(Frame.Text("This nick name is already taken try again"))
             }
         } while (true)
-
     }
 }
 
