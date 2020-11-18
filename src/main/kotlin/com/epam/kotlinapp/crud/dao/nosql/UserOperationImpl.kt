@@ -12,13 +12,14 @@ import kotlinx.dnq.util.*
 object UserOperationImpl : ICommonOperations<User> {
 
     private val conn = CommonStore.entityStore
+    private var typeId: String = "0-"
 
     override fun create(entity: User) = conn.transactional {
         entity.toXdUser().toUser()
     }
 
     override fun getEntity(id: Long): User? = conn.transactional(readonly = true) {
-        XdUser.all().asSequence().firstOrNull { it.entityId.localId == id }?.toUser()
+        kotlin.runCatching { XdUser.findById(typeId.plus(id)) }.getOrNull()?.toUser()
     }
 
     override fun getAll(): ImmutableList<User> = conn.transactional(readonly = true) {
@@ -26,7 +27,7 @@ object UserOperationImpl : ICommonOperations<User> {
     }
 
     override fun update(entity: User): Unit = conn.transactional {
-        XdUser.all().asSequence().first { it.entityId.localId == entity.id }
+        XdUser.findById(typeId.plus(entity.id))
             .update {
                 userName = entity.name
                 email = entity.email
@@ -35,7 +36,7 @@ object UserOperationImpl : ICommonOperations<User> {
     }
 
     override fun delete(id: Long): Unit = conn.transactional {
-        XdUser.all().asSequence().firstOrNull { it.entityId.localId == id }?.delete()
+        XdUser.findById(typeId.plus(id)).delete()
     }
 }
 

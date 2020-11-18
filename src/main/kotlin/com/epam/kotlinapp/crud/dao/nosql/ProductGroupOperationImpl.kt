@@ -7,17 +7,19 @@ import kotlinx.collections.immutable.*
 import kotlinx.collections.immutable.adapters.*
 import kotlinx.dnq.*
 import kotlinx.dnq.query.*
+import kotlinx.dnq.util.*
 
 object ProductGroupOperationImp : ICommonOperations<ProductGroup> {
 
     private val conn = CommonStore.entityStore
+    private var typeId: String = "1-"
 
     override fun create(entity: ProductGroup) = conn.transactional {
         entity.toXdProductGroup().toProductGroup()
     }
 
     override fun getEntity(id: Long): ProductGroup? = conn.transactional(readonly = true) {
-        XdProductGroup.all().asSequence().firstOrNull { it.entityId.localId == id }?.toProductGroup()
+        kotlin.runCatching {XdProductGroup.findById(typeId.plus(id))}.getOrNull()?.toProductGroup()
     }
 
     override fun getAll(): ImmutableList<ProductGroup> = conn.transactional(readonly = true) {
@@ -25,14 +27,14 @@ object ProductGroupOperationImp : ICommonOperations<ProductGroup> {
     }
 
     override fun update(entity: ProductGroup): Unit = conn.transactional {
-        XdProductGroup.all().asSequence().first { it.entityId.localId == entity.id }
+        XdProductGroup.findById(typeId.plus(entity.id))
             .update {
                 groupName = entity.groupName
             }
     }
 
     override fun delete(id: Long): Unit = conn.transactional {
-        XdProductGroup.all().asSequence().firstOrNull { it.entityId.localId == id }?.delete()
+        XdProductGroup.findById(typeId.plus(id)).delete()
     }
 }
 
