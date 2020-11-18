@@ -1,14 +1,14 @@
-package com.epam.kotlinapp.crud.dao
+package com.epam.kotlinapp.crud.dao.sql
 
+import com.epam.kotlinapp.crud.dao.*
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.model.ProductGroup
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.adapters.ImmutableListAdapter
-import java.lang.IllegalArgumentException
 import java.sql.Connection
 import java.sql.Statement
 
+@Deprecated("This class is deprecated, use similar from nosql package",level = DeprecationLevel.WARNING)
 object ProductGroupOperations : ICommonOperations<ProductGroup> {
     //Connection by default
     private var conn: Connection = ConnectionDB.conn

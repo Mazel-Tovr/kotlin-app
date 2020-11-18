@@ -24,7 +24,7 @@ private val productExample = mapOf(
     "productName" to "Itelephone",
     "price" to 1337,
     "description" to "Super duper product",
-    "groupID" to 1,
+    "groupId" to 1,
     "userId" to 1
 )
 

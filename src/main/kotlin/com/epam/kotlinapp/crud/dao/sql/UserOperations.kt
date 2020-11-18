@@ -1,12 +1,13 @@
-package com.epam.kotlinapp.crud.dao
+package com.epam.kotlinapp.crud.dao.sql
 
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.model.User
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.adapters.ImmutableListAdapter
-import java.sql.Connection
-import java.sql.Statement
+import com.epam.kotlinapp.crud.dao.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.model.*
+import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.adapters.*
+import java.sql.*
 
+@Deprecated("This class is deprecated, use similar from nosql package",level = DeprecationLevel.WARNING)
 object UserOperations : ICommonOperations<User> {
 
     private var conn: Connection = ConnectionDB.conn

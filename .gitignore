@@ -6,6 +6,7 @@ build/
 !src/**/build/
 
 distr
+db
 
 gradle-app.setting
 !gradle-wrapper.jar

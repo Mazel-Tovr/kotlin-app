@@ -1,5 +1,6 @@
-package com.epam.kotlinapp.crud.dao
+package com.epam.kotlinapp.crud.dao.sql
 
+import com.epam.kotlinapp.crud.dao.*
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.model.Product
 import kotlinx.collections.immutable.ImmutableList
@@ -7,6 +8,7 @@ import kotlinx.collections.immutable.adapters.ImmutableListAdapter
 import java.sql.Connection
 import java.sql.Statement
 
+@Deprecated("This class is deprecated, use similar from nosql package",level = DeprecationLevel.WARNING)
 object ProductOperations : ICommonOperations<Product> {
 
     private var conn: Connection = ConnectionDB.conn
@@ -17,7 +19,7 @@ object ProductOperations : ICommonOperations<Product> {
         prepareStatement.setString(1, entity.productName)
         prepareStatement.setInt(2, entity.price)
         prepareStatement.setString(3, entity.description)
-        prepareStatement.setLong(4, entity.groupID)
+        prepareStatement.setLong(4, entity.groupId)
         prepareStatement.setLong(5, entity.userId)
         prepareStatement.executeUpdate()
         val resultSet = prepareStatement.generatedKeys
@@ -50,7 +52,7 @@ object ProductOperations : ICommonOperations<Product> {
         prepareStatement.setString(1, entity.productName)
         prepareStatement.setInt(2, entity.price)
         prepareStatement.setString(3, entity.description)
-        prepareStatement.setLong(4, entity.groupID)
+        prepareStatement.setLong(4, entity.groupId)
         prepareStatement.setLong(5, entity.userId)
         entity.id?.let { prepareStatement.setLong(6, it) }
             ?: throw DataException("Product id isn't present ")

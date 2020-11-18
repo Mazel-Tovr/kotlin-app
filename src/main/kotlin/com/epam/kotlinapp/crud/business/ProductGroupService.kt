@@ -1,21 +1,16 @@
 package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.crud.dao.ICommonOperations
-import com.epam.kotlinapp.crud.dao.ProductGroupOperations
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
-import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
-import com.epam.kotlinapp.crud.model.ProductGroup
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.sql.SQLException
+import com.epam.kotlinapp.crud.dao.*
+import com.epam.kotlinapp.crud.dao.nosql.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.model.*
+import kotlinx.collections.immutable.*
+import org.slf4j.*
 
 object ProductGroupService : ICommonServices<ProductGroup> {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val productGroupOperations: ICommonOperations<ProductGroup> = ProductGroupOperations
+    private val productGroupOperations: ICommonOperations<ProductGroup> = ProductGroupOperationImp
 
     override fun create(entity: ProductGroup): ProductGroup {
         return kotlin.runCatching { productGroupOperations.create(entity) }
@@ -40,7 +35,7 @@ object ProductGroupService : ICommonServices<ProductGroup> {
     }
 
     override fun update(entity: ProductGroup) {
-        if (entity.id == null || entity.id == 0L)
+        if (entity.id == null)
             throw DataException("Product group id can't be empty")
         kotlin.runCatching { productGroupOperations.update(entity) }
             .onSuccess { logger.info("Product group updated") }

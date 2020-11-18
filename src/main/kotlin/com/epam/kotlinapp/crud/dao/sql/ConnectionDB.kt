@@ -1,4 +1,4 @@
-package com.epam.kotlinapp.crud.dao
+package com.epam.kotlinapp.crud.dao.sql
 
 
 import org.slf4j.Logger
@@ -7,6 +7,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
+@Deprecated("This class is deprecated, use similar from nosql package",level = DeprecationLevel.WARNING)
 internal object ConnectionDB {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
