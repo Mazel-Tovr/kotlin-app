@@ -12,8 +12,14 @@ import kotlinx.dnq.util.*
 
 object UserOperationImpl : ICommonOperations<User> {
 
-    private const val typeId: String = "0-"
+    private val typeId: String by initId()
     private var conn: TransientEntityStore = CommonStore.entityStore
+
+    private fun initId() = lazy {
+        conn.transactional(readonly = true) {
+            "${conn.persistentStore.getEntityTypeId(XdUser.entityType)}-"
+        }
+    }
 
     override fun create(entity: User) = conn.transactional {
         entity.toXdUser().toUser()

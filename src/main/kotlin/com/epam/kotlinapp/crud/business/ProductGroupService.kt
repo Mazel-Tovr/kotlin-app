@@ -23,7 +23,7 @@ object ProductGroupService : ICommonServices<ProductGroup> {
         return kotlin.runCatching { productGroupOperations.getEntity(id) }
             .onSuccess { logger.info("Getting product group") }
             .onFailure { logger.error(it.message) }
-            .getOrNull() ?: throw UserNotFoundException("Product group with id = $id couldn't found")
+            .getOrNull() ?: throw ProductGroupNotFoundException("Product group with id = $id couldn't found")
 
     }
 

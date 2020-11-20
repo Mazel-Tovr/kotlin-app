@@ -20,14 +20,14 @@ object ConnectionToTestNoSqlDb {
         deletePrevDirectory(File(pathToDatabase))
         val store = StaticStoreContainer.init(File(pathToDatabase), "db")
         initMetaData(XdModel.hierarchy, store)
-        //Костыль чтоб порядоковый номер внешней сущности был всегда одинаковый\\PS никто 100% не понял про что я\\чтоб все работало короче
-        XdUser.all();XdProductGroup.all();XdProduct.all()
         initTestDate(store)
         entityStore = store
     }
 
     fun initTestDate(conn: TransientEntityStore) {
         conn.transactional {
+            XdProductGroup.new { groupName = "Super Duper Group" }
+            XdProductGroup.new { groupName = "Super Duper Group v2" }
 
             XdUser.new {
                 userName = "Roma"
@@ -39,8 +39,7 @@ object ConnectionToTestNoSqlDb {
                 email = "sanya@mail.ru"
                 password = "123"
             }
-            XdProductGroup.new { groupName = "Super Duper Group" }
-            XdProductGroup.new { groupName = "Super Duper Group v2" }
+
             XdProduct.new {
                 productName = "Телефон"
                 price = 228

@@ -12,15 +12,21 @@ import kotlinx.dnq.util.*
 
 object ProductOperationImpl : ICommonOperations<Product> {
 
-    private const val typeId: String = "2-"
-    private var conn : TransientEntityStore = CommonStore.entityStore
+    private val typeId: String by initId()
+    private var conn: TransientEntityStore = CommonStore.entityStore
+
+    private fun initId() = lazy {
+        conn.transactional(readonly = true) {
+             "${conn.persistentStore.getEntityTypeId(XdProduct.entityType)}-"
+        }
+    }
 
     override fun create(entity: Product) = conn.transactional {
         entity.toXdProduct().toProduct()
     }
 
     override fun getEntity(id: Long): Product? = conn.transactional(readonly = true) {
-        kotlin.runCatching {XdProduct.findById(typeId.plus(id))}.getOrNull()?.toProduct()
+        kotlin.runCatching { XdProduct.findById(typeId.plus(id)) }.getOrNull()?.toProduct()
     }
 
     override fun getAll(): ImmutableList<Product> = conn.transactional(readonly = true) {
