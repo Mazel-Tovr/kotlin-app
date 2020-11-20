@@ -2,6 +2,7 @@ package com.epam.kotlinapp.crud.dao.nosql
 
 import com.epam.kotlinapp.crud.dao.*
 import com.epam.kotlinapp.crud.model.*
+import jetbrains.exodus.database.*
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.collections.immutable.*
 import kotlinx.collections.immutable.adapters.*
@@ -10,8 +11,9 @@ import kotlinx.dnq.query.*
 import kotlinx.dnq.util.*
 
 object ProductOperationImpl : ICommonOperations<Product> {
-    private val conn = CommonStore.entityStore
-    private var typeId: String = "2-"
+
+    private const val typeId: String = "2-"
+    private var conn : TransientEntityStore = CommonStore.entityStore
 
     override fun create(entity: Product) = conn.transactional {
         entity.toXdProduct().toProduct()

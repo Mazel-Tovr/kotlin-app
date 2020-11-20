@@ -5,6 +5,7 @@ import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.listener.SubscriptionStorage
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
+import kotlinx.atomicfu.*
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
@@ -19,11 +20,11 @@ class Server : IObserver {
 
     private val sessionSubscriptionStorage: SubscriptionStorage = SubscriptionStorage()
 
-    private var mapOfSessions: PersistentMap<Session, WebSocketSession> = persistentHashMapOf()
+    private val mapOfSessions = atomic(mutableMapOf<Session, WebSocketSession>())
 
     private val countOfUsers = AtomicInteger()
 
-    private var messageHistory = persistentListOf<String>()
+    private val messageHistory = atomic(mutableListOf<String>())
 
     init {
         countOfUsers.set(0)
@@ -35,14 +36,14 @@ class Server : IObserver {
         eventList: List<Event> = Event.values().toList()
     ) {
 
-        val newSession = mapOfSessions.computeIfAbsent(session) { webSocketSession }
+        val newSession = mapOfSessions.value.computeIfAbsent(session) { webSocketSession }
 
         //subscribe user to events all by default
         eventList.forEach { event -> sessionSubscriptionStorage.addSessionToEvent(session, event) }
 
 
         //send all message to new user
-        for (message in messageHistory) {
+        for (message in messageHistory.value) {
             newSession.send(Frame.Text(message))
         }
 
@@ -53,9 +54,9 @@ class Server : IObserver {
     }
 
     suspend fun userLeftServer(session: Session, webSocketSession: WebSocketSession) {
-        mapOfSessions = mapOfSessions.remove(session)
-        webSocketSession.close()
         sessionSubscriptionStorage.removeSessionFromEveryEvent(session)
+        mapOfSessions.value.remove(session)
+        webSocketSession.close()
         sendToAll(serverName, "User ${session.id} left chat")
         sendToAll(serverName, "Users online : ${countOfUsers.decrementAndGet()}")
     }
@@ -63,41 +64,34 @@ class Server : IObserver {
     suspend fun sendMessage(session: Session, message: String) {
         sendToAll(session.id, message)
 
-        if (messageHistory.size > 9) messageHistory = messageHistory.removeAt(0)
-        messageHistory = messageHistory.add("<${session.id}> $message")
+        messageHistory.value.let { list ->
+            if (list.size > 9) {
+                list.removeFirst()
+                list.add("<${session.id}> $message")
+            } else {
+                list.add("<${session.id}> $message")
+            }
+        }
     }
 
     private suspend fun sendToAll(sender: String, message: String) {
-        mapOfSessions.values.forEach { ws -> ws.send(Frame.Text("<$sender> $message")) }
+        mapOfSessions.value.values.forEach { ws -> ws.send(Frame.Text("<$sender> $message")) }
     }
 
     private suspend fun sentToCurrentUser(message: String, webSocketSession: WebSocketSession) {
         webSocketSession.send(Frame.Text("<$serverName> REST: $message"))
     }
 
-    fun isNickNameFree(name: String): Boolean = mapOfSessions[Session(name)] == null
+    fun isNickNameFree(name: String): Boolean = mapOfSessions.value[Session(name)] == null
 
 
     override suspend fun onEvent(event: Event, message: String) {
         val allUserByEvent = sessionSubscriptionStorage.getAllSessionByEvent(event)
 
         allUserByEvent.forEach { user ->
-            val ws = mapOfSessions[user] ?: throw WebSocketException("Session was closed")
-            sentToCurrentUser(message, ws)
-        }
-    }
+            mapOfSessions.value[user]?.let { sentToCurrentUser(message, it) }
+                ?: throw WebSocketException("Session was closed")
 
-    private fun PersistentMap<Session, WebSocketSession>.computeIfAbsent(
-        key: Session,
-        mappingFunction: () -> WebSocketSession
-    ): WebSocketSession {
-
-        val v: WebSocketSession? = this[key]
-        if (v == null) {
-            val newValue: WebSocketSession = mappingFunction()
-            mapOfSessions = put(key, newValue)
-            return newValue
         }
-        return v
     }
 }

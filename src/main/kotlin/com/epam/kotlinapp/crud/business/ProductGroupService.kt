@@ -35,7 +35,7 @@ object ProductGroupService : ICommonServices<ProductGroup> {
     }
 
     override fun update(entity: ProductGroup) {
-        if (entity.id == null)
+        if (entity.id == -1L)
             throw DataException("Product group id can't be empty")
         kotlin.runCatching { productGroupOperations.update(entity) }
             .onSuccess { logger.info("Product group updated") }

@@ -1,31 +1,30 @@
 package api
 
-import com.epam.kotlinapp.crud.model.User
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
+import com.epam.kotlinapp.crud.model.*
+import com.google.gson.*
+import com.google.gson.reflect.*
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.server.testing.*
 import main
-import java.lang.reflect.Type
+import java.lang.reflect.*
 import java.util.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 @KtorExperimentalLocationsAPI
 class UserApiTests {
 
-    private val url: String = "/user"
+    private val url: String = "/users"
+    private val idToDelete: Int = 1
+    private val idToGet = 0
     private val gson = GsonBuilder().create()
-    private val expectedUser: User = User(1, "Roma", "roma@mail.ru", "123")
-    private val expectedAllUsersList: List<User> = listOf(expectedUser, User(2, "Sanya", "sanya@mail.ru", "123"))
-    private val userIdToDelete: Int = 2
-
+    private val expectedUser: User = User(0, "Roma", "roma@mail.ru", "123")
+    private val expectedAllUsersList: List<User> = listOf(expectedUser, User(1, "Sanya", "sanya@mail.ru", "123"))
 
     @Test
     fun getAllUserApiTest() = withTestApplication(Application::main) {
-        with(handleRequest(HttpMethod.Get, "$url/all")) {
+        with(handleRequest(HttpMethod.Get, url)) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<User?>?>() {}.type
             assertEquals(expectedAllUsersList, gson.fromJson(response.content, groupListType))
@@ -34,7 +33,7 @@ class UserApiTests {
 
     @Test
     fun getUserByIdApiTest() = withTestApplication(Application::main) {
-        with(handleRequest(HttpMethod.Get, "$url/1")) {
+        with(handleRequest(HttpMethod.Get, "$url/$idToGet")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(expectedUser, gson.fromJson(response.content, User::class.java))
         }
@@ -66,7 +65,7 @@ class UserApiTests {
     @Test
     fun deleteUserApiTest() = withTestApplication(Application::main) {
 
-        with(handleRequest(HttpMethod.Delete, "$url/$userIdToDelete") {
+        with(handleRequest(HttpMethod.Delete, "$url/$idToDelete") {
             addHeader("accept", "application/json")
             addHeader("Content-Type", "application/json")
 

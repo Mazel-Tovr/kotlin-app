@@ -35,7 +35,7 @@ object ProductService : ICommonServices<Product> {
     }
 
     override fun update(entity: Product) {
-        if (entity.id == null)
+        if (entity.id == -1L)
             throw DataException("Product id can't be empty")
         kotlin.runCatching { productOperations.update(entity) }
             .onSuccess { logger.info("Product updated") }

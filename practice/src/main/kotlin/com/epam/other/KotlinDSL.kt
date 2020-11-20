@@ -1,3 +1,5 @@
+package com.epam.other
+
 data class Person1(var name: String? = null, var age: Int? = null, var address: String? = null)
 data class Person(var name: String? = null, var age: Int? = null, var address: Address? = null)
 data class Address(var country: String? = null, var town: String? = null, var street: String? = null)

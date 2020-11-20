@@ -1,26 +1,21 @@
 package com.epam.kotlinapp.crud.controllers
 
-import com.epam.kotlinapp.Model
-import com.epam.kotlinapp.crud.business.ICommonServices
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
-import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
+import com.epam.kotlinapp.*
+import com.epam.kotlinapp.crud.business.*
+import com.epam.kotlinapp.crud.controllers.roots.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.listener.*
 import com.epam.kotlinapp.crud.listener.Event.*
-import com.epam.kotlinapp.crud.listener.IObserver
-import com.epam.kotlinapp.crud.model.Product
+import com.epam.kotlinapp.crud.model.*
 import de.nielsfalk.ktor.swagger.*
-import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import kotlinx.serialization.Serializable
 
-private const val path: String = "/product"
 
 private val productExample = mapOf(
-    "id" to 0,
     "productName" to "Itelephone",
     "price" to 1337,
     "description" to "Super duper product",
@@ -28,32 +23,17 @@ private val productExample = mapOf(
     "userId" to 1
 )
 
-@KtorExperimentalLocationsAPI
-@Group("Product operations")
-@Location(path.plus("/{id}"))
-class product(val id: Long)
-
-@KtorExperimentalLocationsAPI
-@Group("Product operations")
-@Location(path)
-class products
-
-@KtorExperimentalLocationsAPI
-@Group("Product operations")
-@Location(path.plus("/all"))
-class productGeneric
-
 
 @KtorExperimentalLocationsAPI
 fun Route.productController(productService: ICommonServices<Product>, observer: IObserver) {
 
-    get<productGeneric>("all".responds(ok<Model<Product>>())) {
+    get<ApiRoot.Products>("all".responds(ok<Model<Product>>())) {
 
         observer.onEvent(READ, "Getting all products")
         call.respond(HttpStatusCode.OK, productService.getAll())
 
     }
-    get<product>(
+    get<ApiRoot.Products.CurrentProduct>(
         "find".responds(
             ok<Product>(),
             notFound()
@@ -88,7 +68,7 @@ fun Route.productController(productService: ICommonServices<Product>, observer: 
             }
     }
 
-    post<products, Product>(
+    post<ApiRoot.Products, Product>(
         "create"
             .description("Add new product to date base\nId independence")
             .examples(
@@ -118,7 +98,7 @@ fun Route.productController(productService: ICommonServices<Product>, observer: 
                 }
             }
     }
-    delete<product>(
+    delete<ApiRoot.Products.CurrentProduct>(
         "delete"
             .description("Delete product from db")
             .examples(
@@ -155,7 +135,7 @@ fun Route.productController(productService: ICommonServices<Product>, observer: 
                 }
             }
     }
-    put<products, Product>(
+    put<ApiRoot.Products.CurrentProduct, Product>(
         "update".description("Update product in db (by his id)")
             .examples(
                 example("SuperDuperProduct", productExample, summary = "SuperDuperProduct")
@@ -165,6 +145,14 @@ fun Route.productController(productService: ICommonServices<Product>, observer: 
                 notFound()
             )
     ) { _, product: Product ->
+        product.id = call.parameters["id"].let { param ->
+            if (param == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@put
+            } else {
+                param.toLong()
+            }
+        }
         kotlin.runCatching { productService.update(product) }
             .onSuccess {
                 observer.onEvent(UPDATE, "Product was edited")

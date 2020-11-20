@@ -2,8 +2,8 @@ import com.epam.kotlinapp.chat.server.*
 import com.epam.kotlinapp.crud.business.*
 import com.epam.kotlinapp.crud.controllers.*
 import com.epam.kotlinapp.crud.dao.*
-import com.epam.kotlinapp.crud.dao.sql.*
-import db.*
+import com.epam.kotlinapp.crud.dao.nosql.*
+import connection.nosql.*
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.v2.*
 import de.nielsfalk.ktor.swagger.version.v3.*
@@ -36,9 +36,9 @@ fun Application.main() {
     }
     install(WebSockets)
     //setting con to test bd
-    setConn(ProductOperations)
-    setConn(ProductGroupOperations)
-    setConn(UserOperations)
+    setConn(ProductOperationImpl)
+    setConn(ProductGroupOperationImp)
+    setConn(UserOperationImpl)
 
 
     routing {
@@ -55,6 +55,6 @@ private fun setConn(someImpl: ICommonOperations<*>) {
         .firstOrNull { it.name == "conn" }
     if (member != null) {
         member.isAccessible = true
-        member.setter.call(ConnectionToTestDB.conn)
+        member.setter.call(ConnectionToTestNoSqlDb.entityStore)
     }
 }

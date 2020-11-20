@@ -1,11 +1,8 @@
-import api.ProductApiTest
-import api.ProductGroupApiTest
-import api.UserApiTests
-import chat.WebSocketTest
-import com.epam.kotlinapp.crud.model.ProductGroup
-import org.junit.runner.RunWith
-import org.junit.runners.Suite
-import kotlin.test.Ignore
+import api.*
+import chat.*
+import org.junit.runner.*
+import org.junit.runners.*
+import kotlin.test.*
 
 @Ignore
 @RunWith(Suite::class)

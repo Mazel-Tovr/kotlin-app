@@ -5,6 +5,7 @@ import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.util.*
+import kotlinx.atomicfu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -18,7 +19,6 @@ suspend fun main() {
 }
 
 class ChatClient {
-
     private val exitWord = "exit"
     private val host = "127.0.0.1"
     private val port = 8080

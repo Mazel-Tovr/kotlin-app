@@ -38,7 +38,7 @@ object UserService : ICommonServices<User> {
     }
 
     override fun update(entity: User) {
-        if (entity.id == null)
+        if (entity.id == -1L)
             throw DataException("User id can't be empty")
         kotlin.runCatching { userOperations.update(entity) }
             .onSuccess { logger.info("User updated") }
