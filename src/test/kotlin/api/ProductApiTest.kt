@@ -1,33 +1,31 @@
 package api
 
-import com.epam.kotlinapp.crud.business.ICommonServices
-import com.epam.kotlinapp.crud.business.ProductService
-import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
-import com.epam.kotlinapp.crud.model.Product
-import com.epam.kotlinapp.crud.model.User
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
+import com.epam.kotlinapp.crud.model.*
+import com.google.gson.*
+import com.google.gson.reflect.*
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.locations.*
 import io.ktor.server.testing.*
 import main
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import java.lang.reflect.Type
-import java.util.ArrayList
+import java.lang.reflect.*
+import java.util.*
+import kotlin.test.*
 
+@KtorExperimentalLocationsAPI
 class ProductApiTest {
-    private val url: String = "/product"
-    private val gson = GsonBuilder().create();
-    private val expectedProduct: Product = Product(1, "Телефон", 228, "Nokia 330", 1, 1)
-    private val expectedAllProductList: List<Product> =
-        listOf(expectedProduct, Product(2, "IТелефон", 1337, "Samsung", 2, 2))
-    private val productIdToDelete: Int = 2
 
+    private val url: String = "/products"
+    private val idToDelete = 1
+    private val idToGet = 0
+    private val gson = GsonBuilder().create();
+    private val expectedProduct: Product = Product(0, "Телефон", 228, "Nokia 330", 0, 0)
+    private val expectedAllProductList: List<Product> =
+        listOf(expectedProduct, Product(1, "IТелефон", 1337, "Samsung", 1, 1))
 
     @Test
     fun getAllProductApiTest() = withTestApplication(Application::main) {
-        with(handleRequest(HttpMethod.Get, "$url/all")) {
+        with(handleRequest(HttpMethod.Get, url)) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<Product?>?>() {}.type
             assertEquals(expectedAllProductList, gson.fromJson(response.content, groupListType))
@@ -36,7 +34,7 @@ class ProductApiTest {
 
     @Test
     fun getProductByIdApiTest() = withTestApplication(Application::main) {
-        with(handleRequest(HttpMethod.Get, "$url/1")) {
+        with(handleRequest(HttpMethod.Get, "$url/$idToGet")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(expectedProduct, gson.fromJson(response.content, Product::class.java))
         }
@@ -67,7 +65,7 @@ class ProductApiTest {
     @Test
     fun deleteProductApiTest() = withTestApplication(Application::main) {
 
-        with(handleRequest(HttpMethod.Delete, "$url/$productIdToDelete") {
+        with(handleRequest(HttpMethod.Delete, "$url/$idToDelete") {
             addHeader("accept", "application/json")
             addHeader("Content-Type", "application/json")
 

@@ -1,3 +1,5 @@
+package com.epam.other
+
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -142,5 +144,5 @@ fun partitionLettersAndOtherSymbols() {
 }
 
 fun main() {
-    //usage().forEach{ println(it.key)}
+    //com.epam.other.usage().forEach{ println(it.key)}
 }

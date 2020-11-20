@@ -1,9 +1,6 @@
+package com.epam.other
+
 import kotlinx.coroutines.*
-
-fun main(args: Array<String>) {
-
-}
-
 
 
 

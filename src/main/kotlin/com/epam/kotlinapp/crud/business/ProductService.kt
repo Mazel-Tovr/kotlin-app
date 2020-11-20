@@ -23,7 +23,7 @@ object ProductService : ICommonServices<Product> {
         return kotlin.runCatching { productOperations.getEntity(id) }
             .onSuccess { logger.info("Getting product") }
             .onFailure { logger.error(it.message) }
-            .getOrNull() ?: throw UserNotFoundException("Product with id = $id couldn't found")
+            .getOrNull() ?: throw ProductNotFoundException("Product with id = $id couldn't found")
 
     }
 
@@ -35,7 +35,7 @@ object ProductService : ICommonServices<Product> {
     }
 
     override fun update(entity: Product) {
-        if (entity.id == null)
+        if (entity.id == -1L)
             throw DataException("Product id can't be empty")
         kotlin.runCatching { productOperations.update(entity) }
             .onSuccess { logger.info("Product updated") }

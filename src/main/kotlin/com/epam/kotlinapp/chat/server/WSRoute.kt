@@ -20,7 +20,7 @@ fun Route.webSocket(server: Server) {
                     while (true) {
                         when (val frame = incoming.receive()) {
                             is Frame.Text -> {
-                                server.sendMessage(user, frame.readText())
+                                frame.readText().let { if(it.isNotEmpty())server.sendMessage(user, it) }
                             }
                         }
                     }

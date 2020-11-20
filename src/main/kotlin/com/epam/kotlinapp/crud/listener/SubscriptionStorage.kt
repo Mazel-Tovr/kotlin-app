@@ -1,35 +1,38 @@
 package com.epam.kotlinapp.crud.listener
 
 import com.epam.kotlinapp.chat.server.Session
+import kotlinx.atomicfu.*
 import kotlinx.collections.immutable.*
 import kotlinx.collections.immutable.adapters.ImmutableListAdapter
 
 class SubscriptionStorage {
-    private val listOfEvents: ImmutableMap<Event, MutableList<Session>> = persistentMapOf(
-        Event.CREATE to mutableListOf(),
-        Event.READ to mutableListOf(),
-        Event.UPDATE to mutableListOf(),
-        Event.DELETE to mutableListOf()
+
+    private val listOfEvents = atomic(
+        persistentHashMapOf<Event, AtomicRef<MutableList<Session>>>(
+            Event.CREATE to atomic(mutableListOf()),
+            Event.READ to atomic(mutableListOf()),
+            Event.UPDATE to atomic(mutableListOf()),
+            Event.DELETE to atomic(mutableListOf())
+        )
     )
 
-
     fun addSessionToEvent(session: Session, event: Event) {
-        listOfEvents[event]?.add(session)
+        listOfEvents.value[event]?.value?.add(session)
             ?: throw IllegalArgumentException("This event \"$event\" is not supported")
     }
 
     fun removeSessionFromEvent(session: Session, event: Event) {
-        listOfEvents[event]?.remove(session)
+        listOfEvents.value[event]?.value?.remove(session)
             ?: throw IllegalArgumentException("This event \"$event\" is not supported")
     }
 
     fun removeSessionFromEveryEvent(session: Session) {
-        listOfEvents.values.forEach { list -> list.remove(session) }
+        listOfEvents.value.values.forEach { list -> list.value.remove(session) }
     }
 
     fun getAllSessionByEvent(event: Event): ImmutableList<Session> {
-        if (listOfEvents.containsKey(event))
-            return listOfEvents[event]?.let { ImmutableListAdapter(it) } ?: persistentListOf()
+        if (listOfEvents.value.containsKey(event))
+            return listOfEvents.value[event]?.let { ImmutableListAdapter(it.value) } ?: persistentListOf()
         else
             throw IllegalArgumentException("This event \"$event\" is not supported")
     }

@@ -1,14 +1,13 @@
 package com.epam.kotlinapp.crud.controllers
 
-import com.epam.kotlinapp.Model
-import com.epam.kotlinapp.crud.business.ICommonServices
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
+import com.epam.kotlinapp.*
+import com.epam.kotlinapp.crud.business.*
+import com.epam.kotlinapp.crud.controllers.roots.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.listener.*
 import com.epam.kotlinapp.crud.listener.Event.*
-import com.epam.kotlinapp.crud.listener.IObserver
-import com.epam.kotlinapp.crud.model.User
+import com.epam.kotlinapp.crud.model.*
 import de.nielsfalk.ktor.swagger.*
-import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
@@ -17,40 +16,22 @@ import io.ktor.routing.*
 
 
 private val userExample = mapOf(
-    "id" to 0,
     "name" to "sanya",
     "email" to "pro100sanya@gmail.com",
     "password" to "123"
 )
 
-private const val path: String = "/user"
-
-@KtorExperimentalLocationsAPI
-@Group("User operations")
-@Location(path.plus("/{id}"))
-class user(val id: Long)
-
-@KtorExperimentalLocationsAPI
-@Group("User operations")
-@Location(path)
-class users
-
-@KtorExperimentalLocationsAPI
-@Group("User operations")
-@Location(path.plus("/all"))
-class userGeneric
-
 
 @KtorExperimentalLocationsAPI
 fun Route.userController(userService: ICommonServices<User>, observer: IObserver) {
 
-    get<userGeneric>("all".responds(ok<Model<User>>())) {
+    get<ApiRoot.Users>("all".responds(ok<Model<User>>())) {
 
         observer.onEvent(READ, "Getting all users")
         call.respond(HttpStatusCode.OK, userService.getAll())
 
     }
-    get<user>(
+    get<ApiRoot.Users.CurrentUser>(
         "find".responds(
             ok<User>(),
             notFound()
@@ -85,7 +66,7 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             }
     }
 
-    post<users, User>(
+    post<ApiRoot.Users, User>(
         "create"
             .description("Add new user to date base")
             .examples(
@@ -117,7 +98,7 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             }
     }
 
-    delete<user>(
+    delete<ApiRoot.Users.CurrentUser>(
         "delete".responds(
             ok<Unit>(),
             notFound()
@@ -152,7 +133,7 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
             }
     }
 
-    put<users, User>(
+    put<ApiRoot.Users.CurrentUser, User>(
         "update"
             .description("Update user in db (by his id)")
             .examples(
@@ -162,6 +143,15 @@ fun Route.userController(userService: ICommonServices<User>, observer: IObserver
                 notFound()
             )
     ) { _, user: User ->
+
+        user.id = call.parameters["id"].let { param ->
+            if (param == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@put
+            } else {
+                param.toLong()
+            }
+        }
         kotlin.runCatching { userService.update(user) }
             .onSuccess {
                 observer.onEvent(UPDATE, "User was edited")

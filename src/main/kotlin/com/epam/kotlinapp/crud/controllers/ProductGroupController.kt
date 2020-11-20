@@ -2,9 +2,9 @@ package com.epam.kotlinapp.crud.controllers
 
 import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
+import com.epam.kotlinapp.crud.controllers.roots.*
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
-import com.epam.kotlinapp.crud.exceptions.ProductNotFoundException
 import com.epam.kotlinapp.crud.listener.Event.*
 import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.model.ProductGroup
@@ -16,7 +16,6 @@ import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-private const val path: String = "/productgroup"
 
 private val productGroupExample = mapOf(
     "id" to 0,
@@ -25,31 +24,15 @@ private val productGroupExample = mapOf(
 
 
 @KtorExperimentalLocationsAPI
-@Group("Product group operations")
-@Location(path.plus("/{id}"))
-class productGroup(val id: Long)
-
-@KtorExperimentalLocationsAPI
-@Group("Product group operations")
-@Location(path)
-class productGroups
-
-@KtorExperimentalLocationsAPI
-@Group("Product group operations")
-@Location(path.plus("/all"))
-class productGroupGeneric
-
-
-@KtorExperimentalLocationsAPI
 fun Route.productGroupController(productGroupService: ICommonServices<ProductGroup>, observer: IObserver) {
 
 
-    get<productGroupGeneric>("all".responds(ok<Model<ProductGroup>>())) {
+    get<ApiRoot.ProductGroups>("all".responds(ok<Model<ProductGroup>>())) {
         observer.onEvent(READ, "Getting all product groups")
         call.respond(HttpStatusCode.OK, productGroupService.getAll())
     }
 
-    get<productGroup>(
+    get<ApiRoot.ProductGroups.CurrentProductGroup>(
         "find".responds(
             ok<ProductGroup>(),
             notFound()
@@ -82,7 +65,7 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 }
             }
     }
-    post<productGroups, ProductGroup>(
+    post<ApiRoot.ProductGroups, ProductGroup>(
         "create"
             .description("Add new user to date base")
             .examples(
@@ -114,7 +97,7 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
             }
     }
 
-    delete<productGroup>(
+    delete<ApiRoot.ProductGroups.CurrentProductGroup>(
         "delete".responds(
             ok<Unit>(),
             notFound()
@@ -149,7 +132,7 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
 
             }
     }
-    put<productGroups, ProductGroup>(
+    put<ApiRoot.ProductGroups.CurrentProductGroup, ProductGroup>(
         "update"
             .description("Update product group in db (by his id)")
             .examples(
@@ -159,6 +142,14 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 notFound()
             )
     ) { _, productGroup: ProductGroup ->
+        productGroup.id = call.parameters["id"].let { param ->
+            if (param == null) {
+                call.respond(HttpStatusCode.BadRequest, "Id isn't present")
+                return@put
+            } else {
+                param.toLong()
+            }
+        }
         kotlin.runCatching { productGroupService.update(productGroup) }
             .onSuccess {
                 observer.onEvent(UPDATE, "Product group was edited")
@@ -177,5 +168,4 @@ fun Route.productGroupController(productGroupService: ICommonServices<ProductGro
                 }
             }
     }
-
 }

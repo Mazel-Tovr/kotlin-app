@@ -2,6 +2,7 @@ package com.epam.kotlinapp.crud.dao.nosql
 
 import com.epam.kotlinapp.crud.dao.*
 import com.epam.kotlinapp.crud.model.*
+import jetbrains.exodus.database.*
 import jetbrains.exodus.entitystore.Entity
 import kotlinx.collections.immutable.*
 import kotlinx.collections.immutable.adapters.*
@@ -11,8 +12,14 @@ import kotlinx.dnq.util.*
 
 object UserOperationImpl : ICommonOperations<User> {
 
-    private val conn = CommonStore.entityStore
-    private var typeId: String = "0-"
+    private val typeId: String by initId()
+    private var conn: TransientEntityStore = CommonStore.entityStore
+
+    private fun initId() = lazy {
+        conn.transactional(readonly = true) {
+            "${conn.persistentStore.getEntityTypeId(XdUser.entityType)}-"
+        }
+    }
 
     override fun create(entity: User) = conn.transactional {
         entity.toXdUser().toUser()
