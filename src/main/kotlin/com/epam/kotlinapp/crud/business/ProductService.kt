@@ -1,20 +1,16 @@
 package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.crud.dao.ICommonOperations
-import com.epam.kotlinapp.crud.dao.ProductOperations
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
-import com.epam.kotlinapp.crud.model.Product
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.sql.SQLException
+import com.epam.kotlinapp.crud.dao.*
+import com.epam.kotlinapp.crud.dao.nosql.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.model.*
+import kotlinx.collections.immutable.*
+import org.slf4j.*
 
 object ProductService : ICommonServices<Product> {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val productOperations: ICommonOperations<Product> = ProductOperations
+    private val productOperations: ICommonOperations<Product> = ProductOperationImpl
 
     override fun create(entity: Product): Product {
         return kotlin.runCatching { productOperations.create(entity) }
@@ -39,7 +35,7 @@ object ProductService : ICommonServices<Product> {
     }
 
     override fun update(entity: Product) {
-        if (entity.id == null || entity.id == 0L)
+        if (entity.id == null)
             throw DataException("Product id can't be empty")
         kotlin.runCatching { productOperations.update(entity) }
             .onSuccess { logger.info("Product updated") }
@@ -50,8 +46,6 @@ object ProductService : ICommonServices<Product> {
     }
 
     override fun delete(id: Long) {
-        if (id == 0L)
-            throw DataException("Product id can't be empty")
         kotlin.runCatching { productOperations.delete(id) }
             .onSuccess { logger.info("Product deleted") }
             .onFailure {

@@ -34,6 +34,10 @@ repositories {
     maven {
         url = uri("https://dl.bintray.com/kotlin/kotlinx")
     }
+    gradlePluginPortal()
+    maven(url = "https://oss.jfrog.org/artifactory/list/oss-release-local")
+    maven(url = "https://dl.bintray.com/kotlin/kotlinx/")
+    maven(url = "http://oss.jfrog.org/oss-release-local")
 }
 
 
@@ -55,16 +59,27 @@ dependencies {
     implementation("io.ktor:ktor-websockets:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
 
-    implementation("com.github.Drill4J:ktor-swagger:v0.5.0-drill.2")
+    implementation("com.github.Drill4J:ktor-swagger:$swaggerVersion")
     implementation("junit:junit:4.4")
     implementation("io.ktor:ktor-server-test-host:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:$immutableCollectionsVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    implementation("com.github.Drill4J:kodux:v0.1.8")
+    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serializationVersion")
 
+
+
+
+    implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
+    implementation("org.jetbrains.xodus:dnq:1.4.480")
+//    implementation("com.epam.drill:kodux-jvm:0.1.8")
 
 }
+
+
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }

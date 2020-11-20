@@ -1,19 +1,16 @@
 package com.epam.kotlinapp.crud.business
 
-import com.epam.kotlinapp.crud.dao.ICommonOperations
-import com.epam.kotlinapp.crud.dao.UserOperations
-import com.epam.kotlinapp.crud.exceptions.DataException
-import com.epam.kotlinapp.crud.exceptions.UserNotFoundException
-import com.epam.kotlinapp.crud.model.User
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import com.epam.kotlinapp.crud.dao.*
+import com.epam.kotlinapp.crud.dao.nosql.*
+import com.epam.kotlinapp.crud.exceptions.*
+import com.epam.kotlinapp.crud.model.*
+import kotlinx.collections.immutable.*
+import org.slf4j.*
 
 object UserService : ICommonServices<User> {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val userOperations: ICommonOperations<User> = UserOperations
+    private val userOperations: ICommonOperations<User> = UserOperationImpl
 
     override fun create(entity: User): User {
 
@@ -41,7 +38,7 @@ object UserService : ICommonServices<User> {
     }
 
     override fun update(entity: User) {
-        if (entity.id == null || entity.id == 0L)
+        if (entity.id == null)
             throw DataException("User id can't be empty")
         kotlin.runCatching { userOperations.update(entity) }
             .onSuccess { logger.info("User updated") }
@@ -52,8 +49,6 @@ object UserService : ICommonServices<User> {
     }
 
     override fun delete(id: Long) {
-        if (id == 0L)
-            throw DataException("User id can't be empty")
         kotlin.runCatching { userOperations.delete(id) }
             .onSuccess { logger.info("User deleted") }
             .onFailure {

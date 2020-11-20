@@ -1,31 +1,21 @@
-import db.ConnectionToTestDB
-import com.epam.kotlinapp.chat.server.Server
-import com.epam.kotlinapp.chat.server.webSocket
-import com.epam.kotlinapp.crud.business.ProductGroupService
-import com.epam.kotlinapp.crud.business.ProductService
-import com.epam.kotlinapp.crud.business.UserService
-import com.epam.kotlinapp.crud.controllers.productController
-import com.epam.kotlinapp.crud.controllers.productGroupController
-import com.epam.kotlinapp.crud.controllers.userController
-import com.epam.kotlinapp.crud.dao.ICommonOperations
-import com.epam.kotlinapp.crud.dao.ProductGroupOperations
-import com.epam.kotlinapp.crud.dao.ProductOperations
-import com.epam.kotlinapp.crud.dao.UserOperations
-import de.nielsfalk.ktor.swagger.SwaggerSupport
-import de.nielsfalk.ktor.swagger.json
-import de.nielsfalk.ktor.swagger.version.v2.Swagger
-import de.nielsfalk.ktor.swagger.version.v3.OpenApi
+import com.epam.kotlinapp.chat.server.*
+import com.epam.kotlinapp.crud.business.*
+import com.epam.kotlinapp.crud.controllers.*
+import com.epam.kotlinapp.crud.dao.*
+import com.epam.kotlinapp.crud.dao.sql.*
+import db.*
+import de.nielsfalk.ktor.swagger.*
+import de.nielsfalk.ktor.swagger.version.v2.*
+import de.nielsfalk.ktor.swagger.version.v3.*
 import io.ktor.application.*
-import io.ktor.client.features.json.serializer.*
 import io.ktor.features.*
-import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.websocket.*
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.*
+import kotlin.reflect.full.*
+import kotlin.reflect.jvm.*
 
 
 //Server for testing
