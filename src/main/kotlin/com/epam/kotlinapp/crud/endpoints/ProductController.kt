@@ -1,8 +1,8 @@
-package com.epam.kotlinapp.crud.controllers
+package com.epam.kotlinapp.crud.endpoints
 
-import com.epam.kotlinapp.*
+import com.epam.*
 import com.epam.kotlinapp.crud.business.*
-import com.epam.kotlinapp.crud.controllers.roots.*
+import com.epam.kotlinapp.crud.endpoints.roots.*
 import com.epam.kotlinapp.crud.exceptions.*
 import com.epam.kotlinapp.crud.listener.*
 import com.epam.kotlinapp.crud.listener.Event.*

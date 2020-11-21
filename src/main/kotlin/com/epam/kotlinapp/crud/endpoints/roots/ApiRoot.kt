@@ -1,4 +1,4 @@
-package com.epam.kotlinapp.crud.controllers.roots
+package com.epam.kotlinapp.crud.endpoints.roots
 
 import de.nielsfalk.ktor.swagger.version.shared.*
 import io.ktor.locations.*

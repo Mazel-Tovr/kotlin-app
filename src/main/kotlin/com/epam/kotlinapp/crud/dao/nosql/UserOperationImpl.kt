@@ -67,7 +67,7 @@ private fun XdUser.toUser() = User(entityId.localId, userName, email, password)
 private fun XdUser.update(builder: XdUser.() -> Unit): XdUser = apply { builder() }
 
 
-class XdUser(entity: Entity) : XdEntity(entity) {
+internal class XdUser(entity: Entity) : XdEntity(entity) {
     companion object : XdNaturalEntityType<XdUser>()
 
     var userName by xdRequiredStringProp()

@@ -60,7 +60,7 @@ private fun XdProductGroup.toProductGroup() = ProductGroup(entityId.localId, gro
 private fun XdProductGroup.update(builder: XdProductGroup.() -> Unit): XdProductGroup = apply { builder() }
 
 
-class XdProductGroup(entity: Entity) : XdEntity(entity) {
+internal class XdProductGroup(entity: Entity) : XdEntity(entity) {
     companion object : XdNaturalEntityType<XdProductGroup>()
 
     var groupName by xdRequiredStringProp()

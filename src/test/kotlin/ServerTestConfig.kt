@@ -1,6 +1,6 @@
 import com.epam.kotlinapp.chat.server.*
 import com.epam.kotlinapp.crud.business.*
-import com.epam.kotlinapp.crud.controllers.*
+import com.epam.kotlinapp.crud.endpoints.*
 import com.epam.kotlinapp.crud.dao.*
 import com.epam.kotlinapp.crud.dao.nosql.*
 import connection.nosql.*

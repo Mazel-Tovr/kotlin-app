@@ -1,15 +1,14 @@
-package com.epam.kotlinapp.crud.controllers
+package com.epam.kotlinapp.crud.endpoints
 
-import com.epam.kotlinapp.Model
+import com.epam.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
-import com.epam.kotlinapp.crud.controllers.roots.*
+import com.epam.kotlinapp.crud.endpoints.roots.*
 import com.epam.kotlinapp.crud.exceptions.DataException
 import com.epam.kotlinapp.crud.exceptions.ProductGroupNotFoundException
 import com.epam.kotlinapp.crud.listener.Event.*
 import com.epam.kotlinapp.crud.listener.IObserver
 import com.epam.kotlinapp.crud.model.ProductGroup
 import de.nielsfalk.ktor.swagger.*
-import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*

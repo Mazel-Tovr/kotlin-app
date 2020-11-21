@@ -73,7 +73,7 @@ private fun XdProduct.toProduct() = Product(entityId.localId, productName, price
 private fun XdProduct.update(builder: XdProduct.() -> Unit): XdProduct = apply { builder() }
 
 
-class XdProduct(entity: Entity) : XdEntity(entity) {
+internal class XdProduct(entity: Entity) : XdEntity(entity) {
     companion object : XdNaturalEntityType<XdProduct>()
 
     var productName by xdRequiredStringProp()

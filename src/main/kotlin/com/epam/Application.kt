@@ -1,18 +1,12 @@
-package com.epam.kotlinapp
+package com.epam
 
-import com.epam.kotlinapp.chat.server.Server
-import com.epam.kotlinapp.chat.server.webSocket
-import com.epam.kotlinapp.crud.business.ProductGroupService
-import com.epam.kotlinapp.crud.business.ProductService
-import com.epam.kotlinapp.crud.business.UserService
-import com.epam.kotlinapp.crud.controllers.productController
-import com.epam.kotlinapp.crud.controllers.productGroupController
-import com.epam.kotlinapp.crud.controllers.userController
-import de.nielsfalk.ktor.swagger.SwaggerSupport
-import de.nielsfalk.ktor.swagger.version.shared.Contact
-import de.nielsfalk.ktor.swagger.version.shared.Information
-import de.nielsfalk.ktor.swagger.version.v2.Swagger
-import de.nielsfalk.ktor.swagger.version.v3.OpenApi
+import com.epam.kotlinapp.chat.server.*
+import com.epam.kotlinapp.crud.business.*
+import com.epam.kotlinapp.crud.endpoints.*
+import de.nielsfalk.ktor.swagger.*
+import de.nielsfalk.ktor.swagger.version.shared.*
+import de.nielsfalk.ktor.swagger.version.v2.*
+import de.nielsfalk.ktor.swagger.version.v3.*
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.locations.*

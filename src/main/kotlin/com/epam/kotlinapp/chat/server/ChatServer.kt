@@ -1,15 +1,10 @@
 package com.epam.kotlinapp.chat.server
 
-import com.epam.kotlinapp.crud.listener.Event
-import com.epam.kotlinapp.crud.listener.IObserver
-import com.epam.kotlinapp.crud.listener.SubscriptionStorage
+import com.epam.kotlinapp.crud.listener.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.atomicfu.*
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.persistentHashMapOf
-import kotlinx.collections.immutable.persistentListOf
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.*
 
 
 data class Session(val id: String)
@@ -20,7 +15,7 @@ class Server : IObserver {
 
     private val sessionSubscriptionStorage: SubscriptionStorage = SubscriptionStorage()
 
-    private val mapOfSessions = atomic(mutableMapOf<Session, WebSocketSession>())
+    private val sessions = atomic(mutableMapOf<Session, WebSocketSession>())
 
     private val countOfUsers = AtomicInteger()
 
@@ -35,14 +30,10 @@ class Server : IObserver {
         webSocketSession: WebSocketSession,
         eventList: List<Event> = Event.values().toList()
     ) {
+        val newSession = sessions.value.computeIfAbsent(session) { webSocketSession }
 
-        val newSession = mapOfSessions.value.computeIfAbsent(session) { webSocketSession }
-
-        //subscribe user to events all by default
         eventList.forEach { event -> sessionSubscriptionStorage.addSessionToEvent(session, event) }
 
-
-        //send all message to new user
         for (message in messageHistory.value) {
             newSession.send(Frame.Text(message))
         }
@@ -50,12 +41,12 @@ class Server : IObserver {
         sendToAll(serverName, "New user in the chat: ${session.id}")
         sendToAll(serverName, "Users online : ${countOfUsers.incrementAndGet()}")
 
-        sentToCurrentUser("You are subscribe to this REST events $eventList", newSession)
+        sendToCurrentUser("You are subscribe to this REST events $eventList", newSession)
     }
 
     suspend fun userLeftServer(session: Session, webSocketSession: WebSocketSession) {
         sessionSubscriptionStorage.removeSessionFromEveryEvent(session)
-        mapOfSessions.value.remove(session)
+        sessions.value.remove(session)
         webSocketSession.close()
         sendToAll(serverName, "User ${session.id} left chat")
         sendToAll(serverName, "Users online : ${countOfUsers.decrementAndGet()}")
@@ -64,6 +55,10 @@ class Server : IObserver {
     suspend fun sendMessage(session: Session, message: String) {
         sendToAll(session.id, message)
 
+        addToMessageHistory(session, message)
+    }
+
+    private fun addToMessageHistory(session: Session, message: String) {
         messageHistory.value.let { list ->
             if (list.size > 9) {
                 list.removeFirst()
@@ -75,23 +70,22 @@ class Server : IObserver {
     }
 
     private suspend fun sendToAll(sender: String, message: String) {
-        mapOfSessions.value.values.forEach { ws -> ws.send(Frame.Text("<$sender> $message")) }
+        sessions.value.values.forEach { ws -> ws.send(Frame.Text("<$sender> $message")) }
     }
 
-    private suspend fun sentToCurrentUser(message: String, webSocketSession: WebSocketSession) {
+    private suspend fun sendToCurrentUser(message: String, webSocketSession: WebSocketSession) {
         webSocketSession.send(Frame.Text("<$serverName> REST: $message"))
     }
 
-    fun isNickNameFree(name: String): Boolean = mapOfSessions.value[Session(name)] == null
+    fun isNickNameFree(name: String): Boolean = sessions.value[Session(name)] == null
 
 
     override suspend fun onEvent(event: Event, message: String) {
-        val allUserByEvent = sessionSubscriptionStorage.getAllSessionByEvent(event)
+        val usersByEvent = sessionSubscriptionStorage.getAllSessionByEvent(event)
 
-        allUserByEvent.forEach { user ->
-            mapOfSessions.value[user]?.let { sentToCurrentUser(message, it) }
+        usersByEvent.forEach { user ->
+            sessions.value[user]?.let { sendToCurrentUser(message, it) }
                 ?: throw WebSocketException("Session was closed")
-
         }
     }
 }

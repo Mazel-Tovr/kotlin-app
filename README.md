@@ -4,15 +4,15 @@
 ### Application description
 ##### It's a simple crud application. To interaction with it is carried out by this APIs
 ###### Shortcut: req -> request / resp -> response / desc -> description /db -> database/ws -> WebSocket
-###### Main controllers paths are this {controller} = [user,product,productgroup]
+###### Main controllers paths are this {controller} = [users,products,productgroups]
 ###### Resp status if everything good -> 200 OK otherwise 400 Bad req
 
 | API | http req method | desc |
 |:----------------:|:-------:|:---------:|
-| ```http://your-host/{controller}/all``` | GET | get all entities from db|
+| ```http://your-host/{controller}``` | GET | get all entities from db|
 | ```http://your-host/{controller}/{id}``` | GET | get entity with this id |
 | ```http://your-host/{controller}``` | POST | create new entity (entity should be in req body) |
-| ```http://your-host/{controller}``` | PUT | edit entity (entity should be in req body)|
+| ```http://your-host/{controller}/{id}``` | PUT | edit entity (entity should be in req body)|
 | ```http://your-host/{controller}/{id}``` | DELETE | delete entity from db|
 
 ##### Application also have ws (some kind chat with some extra features) to connect to ws use this path ```http://your-host/ws```
