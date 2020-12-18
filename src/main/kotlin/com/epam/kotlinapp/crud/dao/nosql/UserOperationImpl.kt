@@ -10,7 +10,7 @@ import kotlinx.dnq.*
 import kotlinx.dnq.query.*
 import kotlinx.dnq.util.*
 
-object UserOperationImpl : ICommonOperations<User> {
+open class UserOperationImpl : ICommonOperations<User> {
 
     private val typeId: String by initId()
     private var conn: TransientEntityStore = CommonStore.entityStore

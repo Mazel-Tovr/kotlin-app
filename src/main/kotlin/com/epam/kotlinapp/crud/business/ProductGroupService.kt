@@ -7,10 +7,9 @@ import com.epam.kotlinapp.crud.model.*
 import kotlinx.collections.immutable.*
 import org.slf4j.*
 
-object ProductGroupService : ICommonServices<ProductGroup> {
+class ProductGroupService(private val productGroupOperations: ICommonOperations<ProductGroup>) : ICommonServices<ProductGroup> {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val productGroupOperations: ICommonOperations<ProductGroup> = ProductGroupOperationImp
 
     override fun create(entity: ProductGroup): ProductGroup {
         return kotlin.runCatching { productGroupOperations.create(entity) }

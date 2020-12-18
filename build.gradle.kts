@@ -1,4 +1,6 @@
+import kotlinx.coroutines.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.concurrent.*
 
 plugins {
 //    kotlin("plugin.serialization")
@@ -64,18 +66,11 @@ dependencies {
     implementation("io.ktor:ktor-server-test-host:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:$immutableCollectionsVersion")
 
-    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serializationVersion")
-
-
-
-
     implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
     implementation("org.jetbrains.xodus:dnq:1.4.480")
-//    implementation("com.epam.drill:kodux-jvm:0.1.8")
+
+    //implementation("org.mockito:mockito-core:2.10.0")
+    testImplementation("com.nhaarman:mockito-kotlin:0.9.0")
 
 }
 
@@ -83,3 +78,41 @@ dependencies {
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+val startLocalServerTask = tasks.create("startLocalServer", JavaExec::class) {
+    group = "application"
+    classpath = sourceSets["main"].runtimeClasspath//sourceSets.main.get().runtimeClasspath
+    main = "com.epam.TestKt"
+    println("Hey")
+    dependsOn(tasks["run"])
+}
+
+
+
+tasks["run"].run {
+
+//    val pool = Executors.newFixedThreadPool(5)
+//    try {
+//        pool.submit {
+//            println("Hello ")
+//            startLocalServerTask.exec()
+//        }.get()
+//    } finally {
+//        println("lel")
+//        pool.shutdown()
+//    }
+//    Thread(){
+//        fun run(){
+//            println("Start")
+//            dependsOn(startLocalServerTask)
+//        }
+//    }.start()
+//    GlobalScope.launch {
+//        startLocalServerTask.exec()
+//    }
+}
+
+//startLocalServerTask.exec()
+
+//}
+

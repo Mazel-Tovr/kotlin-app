@@ -1,5 +1,6 @@
-package api
+package integration
 
+import ServerTestConfig
 import com.epam.kotlinapp.crud.model.*
 import com.google.gson.*
 import com.google.gson.reflect.*
@@ -7,7 +8,6 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.server.testing.*
-import main
 import java.lang.reflect.*
 import java.util.*
 import kotlin.test.*
@@ -24,7 +24,7 @@ class ProductApiTest {
         listOf(expectedProduct, Product(1, "IТелефон", 1337, "Samsung", 1, 1))
 
     @Test
-    fun getAllProductApiTest() = withTestApplication(Application::main) {
+    fun getAllProductApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, url)) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<Product?>?>() {}.type
@@ -33,7 +33,7 @@ class ProductApiTest {
     }
 
     @Test
-    fun getProductByIdApiTest() = withTestApplication(Application::main) {
+    fun getProductByIdApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, "$url/$idToGet")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(expectedProduct, gson.fromJson(response.content, Product::class.java))
@@ -41,7 +41,7 @@ class ProductApiTest {
     }
 
     @Test
-    fun createProductApiTest() = withTestApplication(Application::main) {
+    fun createProductApiTest() = withTestApplication(Application::ServerTestConfig) {
 
         with(handleRequest(HttpMethod.Post, url) {
             addHeader("accept", "application/json")
@@ -63,7 +63,7 @@ class ProductApiTest {
     }
 
     @Test
-    fun deleteProductApiTest() = withTestApplication(Application::main) {
+    fun deleteProductApiTest() = withTestApplication(Application::ServerTestConfig) {
 
         with(handleRequest(HttpMethod.Delete, "$url/$idToDelete") {
             addHeader("accept", "application/json")

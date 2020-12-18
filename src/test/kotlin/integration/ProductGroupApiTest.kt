@@ -1,5 +1,6 @@
-package api
+package integration
 
+import ServerTestConfig
 import com.epam.kotlinapp.crud.model.*
 import com.google.gson.*
 import com.google.gson.reflect.*
@@ -7,7 +8,6 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.server.testing.*
-import main
 import java.lang.reflect.*
 import java.util.*
 import kotlin.test.*
@@ -24,7 +24,7 @@ class ProductGroupApiTest {
         listOf(expectedProduct, ProductGroup(1, "Super Duper Group v2"))
 
     @Test
-    fun getAllProductGroupApiTest() = withTestApplication(Application::main) {
+    fun getAllProductGroupApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, url)) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<ProductGroup?>?>() {}.type
@@ -33,7 +33,7 @@ class ProductGroupApiTest {
     }
 
     @Test
-    fun getProductGroupByIdApiTest() = withTestApplication(Application::main) {
+    fun getProductGroupByIdApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, "$url/$idToGet")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(expectedProduct, gson.fromJson(response.content, ProductGroup::class.java))
@@ -41,7 +41,7 @@ class ProductGroupApiTest {
     }
 
     @Test()
-    fun createProductGroupApiTest() = withTestApplication(Application::main) {
+    fun createProductGroupApiTest() = withTestApplication(Application::ServerTestConfig) {
 
         var productGroup: ProductGroup
         with(handleRequest(HttpMethod.Post, url) {
@@ -62,7 +62,7 @@ class ProductGroupApiTest {
     }
 
     @Test
-    fun deleteUserApiTest() = withTestApplication(Application::main) {
+    fun deleteUserApiTest() = withTestApplication(Application::ServerTestConfig) {
 
         with(handleRequest(HttpMethod.Delete, "$url/$idToDelete") {
             addHeader("accept", "application/json")

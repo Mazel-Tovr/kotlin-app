@@ -7,10 +7,9 @@ import com.epam.kotlinapp.crud.model.*
 import kotlinx.collections.immutable.*
 import org.slf4j.*
 
-object UserService : ICommonServices<User> {
+class UserService(private val userOperations: ICommonOperations<User>) : ICommonServices<User> {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val userOperations: ICommonOperations<User> = UserOperationImpl
 
     override fun create(entity: User): User {
 
