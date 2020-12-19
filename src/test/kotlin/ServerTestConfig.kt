@@ -38,11 +38,11 @@ fun Application.ServerTestConfig() {
     //setting con to test bd
     setConn(ProductOperationImpl)
     setConn(ProductGroupOperationImp)
-    val userOperation = setConn(UserOperationImpl())
+    setConn(UserOperationImpl)
 
 
     routing {
-        this.userController(UserService(userOperation as UserOperationImpl), server)
+        this.userController(UserService(UserOperationImpl), server)
         this.productController(ProductService(ProductOperationImpl), server)
         this.productGroupController(ProductGroupService(ProductGroupOperationImp), server)
         this.webSocket(server)

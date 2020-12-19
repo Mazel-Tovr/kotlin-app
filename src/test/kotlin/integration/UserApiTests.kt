@@ -41,7 +41,7 @@ class UserApiTests {
 
     @Test
     fun createUserApiTest() = withTestApplication(Application::ServerTestConfig) {
-
+        Thread.sleep(20000)
         var userFromResponse: User
         with(handleRequest(HttpMethod.Post, url) {
             addHeader("accept", "application/json")

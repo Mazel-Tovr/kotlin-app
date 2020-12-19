@@ -57,7 +57,7 @@ fun main() {
 
         routing {
 
-            this.userController(UserService(UserOperationImpl()),server)
+            this.userController(UserService(UserOperationImpl),server)
             this.productController(ProductService(ProductOperationImpl),server)
             this.productGroupController(ProductGroupService(ProductGroupOperationImp),server)
             this.webSocket(server)

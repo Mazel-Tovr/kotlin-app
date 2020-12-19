@@ -1,6 +1,5 @@
 import kotlinx.coroutines.*
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.util.concurrent.*
+import org.jetbrains.kotlin.gradle.tasks.*
 
 plugins {
 //    kotlin("plugin.serialization")
@@ -15,9 +14,6 @@ plugins {
 group = "com.epam"
 version = "1.0-SNAPSHOT"
 
-application {
-    mainClassName = "com.epam.kotlinapp.ApplicationKt"
-}
 tasks {
     build {
         dependsOn(shadowJar)
@@ -79,40 +75,37 @@ tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-val startLocalServerTask = tasks.create("startLocalServer", JavaExec::class) {
-    group = "application"
-    classpath = sourceSets["main"].runtimeClasspath//sourceSets.main.get().runtimeClasspath
-    main = "com.epam.TestKt"
-    println("Hey")
-    dependsOn(tasks["run"])
+application {
+    mainClassName = "com.epam.kotlinapp.ApplicationKt"
+
 }
 
 
+tasks.register("startServer", CustomTask::class) {
 
-tasks["run"].run {
-
-//    val pool = Executors.newFixedThreadPool(5)
-//    try {
-//        pool.submit {
-//            println("Hello ")
-//            startLocalServerTask.exec()
-//        }.get()
-//    } finally {
-//        println("lel")
-//        pool.shutdown()
-//    }
-//    Thread(){
-//        fun run(){
-//            println("Start")
-//            dependsOn(startLocalServerTask)
-//        }
-//    }.start()
-//    GlobalScope.launch {
-//        startLocalServerTask.exec()
-//    }
+    classpath = files("TestServer/build/libs/TestServer-1.0.0.jar")
 }
 
-//startLocalServerTask.exec()
+open class CustomTask : JavaExec() {
+    override fun exec() {
+        GlobalScope.launch {
+            super.exec()
+        }
+    }
+}
 
-//}
+val a = tasks.create("jarServer") {
+    dependsOn(":TestServer:jar")
+    //didWork = true
+}
+
+
+tasks.withType<Test> {
+    dependsOn(a)
+//    while (!a.didWork) {
+//    }
+    dependsOn("startServer")
+}
+
+
 

@@ -1,15 +1,14 @@
 package com.epam
 
 import com.sun.net.httpserver.*
-import io.ktor.utils.io.core.Closeable
-import kotlinx.coroutines.*
 import java.io.*
 import java.net.*
 import kotlin.text.toByteArray
 
-object LocalServer : Closeable {
+@Deprecated("There is some problem with kotlin main")
+object LocalServer {
 
-    private val httpServer = HttpServer.create(InetSocketAddress("localhost", 1234), 0)
+    private val httpServer: HttpServer = HttpServer.create(InetSocketAddress("localhost", 1234), 0)
 
     fun startServer() {
         httpServer.createContext("/api/agents/Petclinic/plugins/test2code/dispatch-action") { httpExchange ->
@@ -40,21 +39,20 @@ object LocalServer : Closeable {
         }
         httpServer.executor = null
         httpServer.start()
-        println("Server host ${httpServer!!.address} ")
+        println("Server host ${httpServer.address} ")
     }
 
-    override fun close() {
+     fun close() {
         println("I am closed")
         httpServer.stop(1)
     }
 
 }
 
-
 fun main(args: Array<String>) {
     println("Hello there")
     LocalServer.startServer()
-    Runtime.getRuntime().addShutdownHook(Thread(Runnable {
+    Runtime.getRuntime().addShutdownHook(Thread {
         LocalServer.close()
-    }))
+    })
 }
