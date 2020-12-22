@@ -65,8 +65,8 @@ dependencies {
     implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
     implementation("org.jetbrains.xodus:dnq:1.4.480")
 
-    //implementation("org.mockito:mockito-core:2.10.0")
-    testImplementation("com.nhaarman:mockito-kotlin:0.9.0")
+    testImplementation("io.mockk:mockk:1.10.3-jdk8")
+
 
 }
 
@@ -81,30 +81,11 @@ application {
 }
 
 
-tasks.register("startServer", CustomTask::class) {
-
-    classpath = files("TestServer/build/libs/TestServer-1.0.0.jar")
-}
-
-open class CustomTask : JavaExec() {
-    override fun exec() {
-        GlobalScope.launch {
-            super.exec()
-        }
-    }
-}
-
-val a = tasks.create("jarServer") {
-    dependsOn(":TestServer:jar")
-    //didWork = true
-}
-
 
 tasks.withType<Test> {
-    dependsOn(a)
-//    while (!a.didWork) {
-//    }
-    dependsOn("startServer")
+   // dependsOn(":TestServer:startServer")
+
+
 }
 
 

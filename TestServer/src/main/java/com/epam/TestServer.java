@@ -1,8 +1,5 @@
 package com.epam;
 
-import com.sun.net.httpserver.HttpContext;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -14,7 +11,7 @@ public class TestServer {
     private HttpServer httpServer;
 
     public void startServer() throws IOException {
-        httpServer = HttpServer.create(new InetSocketAddress("localhost",1234), 0);
+        httpServer = HttpServer.create(new InetSocketAddress("localhost",0), 0);
 
         httpServer.createContext("/test", httpExchange -> {
             String response = "This is the response";
@@ -29,6 +26,7 @@ public class TestServer {
     }
 
     public void stopServe() {
+        System.out.println("I am stopped");
         httpServer.stop(1);
     }
 
