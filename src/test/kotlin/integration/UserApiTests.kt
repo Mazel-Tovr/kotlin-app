@@ -1,5 +1,6 @@
-package api
+package integration
 
+import ServerTestConfig
 import com.epam.kotlinapp.crud.model.*
 import com.google.gson.*
 import com.google.gson.reflect.*
@@ -7,7 +8,6 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.server.testing.*
-import main
 import java.lang.reflect.*
 import java.util.*
 import kotlin.test.*
@@ -23,7 +23,7 @@ class UserApiTests {
     private val expectedAllUsersList: List<User> = listOf(expectedUser, User(1, "Sanya", "sanya@mail.ru", "123"))
 
     @Test
-    fun getAllUserApiTest() = withTestApplication(Application::main) {
+    fun getAllUserApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, url)) {
             assertEquals(HttpStatusCode.OK, response.status())
             val groupListType: Type = object : TypeToken<ArrayList<User?>?>() {}.type
@@ -32,7 +32,7 @@ class UserApiTests {
     }
 
     @Test
-    fun getUserByIdApiTest() = withTestApplication(Application::main) {
+    fun getUserByIdApiTest() = withTestApplication(Application::ServerTestConfig) {
         with(handleRequest(HttpMethod.Get, "$url/$idToGet")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(expectedUser, gson.fromJson(response.content, User::class.java))
@@ -40,8 +40,8 @@ class UserApiTests {
     }
 
     @Test
-    fun createUserApiTest() = withTestApplication(Application::main) {
-
+    fun createUserApiTest() = withTestApplication(Application::ServerTestConfig) {
+        Thread.sleep(20000)
         var userFromResponse: User
         with(handleRequest(HttpMethod.Post, url) {
             addHeader("accept", "application/json")
@@ -63,7 +63,7 @@ class UserApiTests {
     }
 
     @Test
-    fun deleteUserApiTest() = withTestApplication(Application::main) {
+    fun deleteUserApiTest() = withTestApplication(Application::ServerTestConfig) {
 
         with(handleRequest(HttpMethod.Delete, "$url/$idToDelete") {
             addHeader("accept", "application/json")

@@ -1,3 +1,3 @@
 
 rootProject.name = "kotlin-app"
-include(":practice")
+include(":TestServer")

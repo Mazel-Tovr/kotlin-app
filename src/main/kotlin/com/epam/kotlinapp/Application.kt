@@ -1,7 +1,8 @@
-package com.epam
+package com.epam.kotlinapp
 
 import com.epam.kotlinapp.chat.server.*
 import com.epam.kotlinapp.crud.business.*
+import com.epam.kotlinapp.crud.dao.nosql.*
 import com.epam.kotlinapp.crud.endpoints.*
 import de.nielsfalk.ktor.swagger.*
 import de.nielsfalk.ktor.swagger.version.shared.*
@@ -23,7 +24,7 @@ data class Model<T>(val elements: MutableList<T>)
 @KtorExperimentalLocationsAPI
 fun main() {
     val server = Server()
-    embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
+    embeddedServer(Netty, port = 8088, host = "127.0.0.1") {
 
         install(DefaultHeaders)
         install(CallLogging)
@@ -54,12 +55,11 @@ fun main() {
 
         install(WebSockets)
 
-
         routing {
 
-            this.userController(UserService,server)
-            this.productController(ProductService,server)
-            this.productGroupController(ProductGroupService,server)
+            this.userController(UserService(UserOperationImpl),server)
+            this.productController(ProductService(ProductOperationImpl),server)
+            this.productGroupController(ProductGroupService(ProductGroupOperationImp),server)
             this.webSocket(server)
         }
     }.start(wait = true)

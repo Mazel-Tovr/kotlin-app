@@ -20,7 +20,7 @@ import kotlin.reflect.jvm.*
 
 //Server for testing
 @KtorExperimentalLocationsAPI
-fun Application.main() {
+fun Application.ServerTestConfig() {
 
     val server = Server()
 
@@ -42,14 +42,14 @@ fun Application.main() {
 
 
     routing {
-        this.userController(UserService,server)
-        this.productController(ProductService,server)
-        this.productGroupController(ProductGroupService,server)
+        this.userController(UserService(UserOperationImpl), server)
+        this.productController(ProductService(ProductOperationImpl), server)
+        this.productGroupController(ProductGroupService(ProductGroupOperationImp), server)
         this.webSocket(server)
     }
 }
 
-private fun setConn(someImpl: ICommonOperations<*>) {
+private fun setConn(someImpl: ICommonOperations<*>): ICommonOperations<*> {
     val kClass = Class.forName(someImpl.javaClass.name).kotlin
     val member = kClass.memberProperties.filterIsInstance<KMutableProperty<*>>()
         .firstOrNull { it.name == "conn" }
@@ -57,4 +57,5 @@ private fun setConn(someImpl: ICommonOperations<*>) {
         member.isAccessible = true
         member.setter.call(ConnectionToTestNoSqlDb.entityStore)
     }
+    return someImpl
 }

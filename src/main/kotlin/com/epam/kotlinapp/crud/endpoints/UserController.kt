@@ -1,6 +1,6 @@
 package com.epam.kotlinapp.crud.endpoints
 
-import com.epam.*
+import com.epam.kotlinapp.*
 import com.epam.kotlinapp.crud.business.*
 import com.epam.kotlinapp.crud.endpoints.roots.*
 import com.epam.kotlinapp.crud.exceptions.*

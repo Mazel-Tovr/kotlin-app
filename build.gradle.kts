@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlinx.coroutines.*
+import org.jetbrains.kotlin.gradle.tasks.*
 
 plugins {
 //    kotlin("plugin.serialization")
@@ -13,9 +14,6 @@ plugins {
 group = "com.epam"
 version = "1.0-SNAPSHOT"
 
-application {
-    mainClassName = "com.epam.kotlinapp.ApplicationKt"
-}
 tasks {
     build {
         dependsOn(shadowJar)
@@ -64,18 +62,11 @@ dependencies {
     implementation("io.ktor:ktor-server-test-host:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:$immutableCollectionsVersion")
 
-    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$serializationVersion")
-
-
-
-
     implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
     implementation("org.jetbrains.xodus:dnq:1.4.480")
-//    implementation("com.epam.drill:kodux-jvm:0.1.8")
+
+    testImplementation("io.mockk:mockk:1.10.3-jdk8")
+
 
 }
 
@@ -83,3 +74,19 @@ dependencies {
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+application {
+    mainClassName = "com.epam.kotlinapp.ApplicationKt"
+
+}
+
+
+
+tasks.withType<Test> {
+   // dependsOn(":TestServer:startServer")
+
+
+}
+
+
+

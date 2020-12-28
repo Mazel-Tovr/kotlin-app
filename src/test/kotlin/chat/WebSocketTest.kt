@@ -1,14 +1,10 @@
 package chat
 
-import de.nielsfalk.ktor.swagger.swaggerUi
+import ServerTestConfig
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.server.testing.*
-import main
-import java.lang.Exception
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 @Ignore
 class WebSocketTest {
@@ -17,7 +13,7 @@ class WebSocketTest {
     private val anotherUser = "Sanya"
 
     @Test
-    fun callbackFromServerTest() = withTestApplication(Application::main) {
+    fun callbackFromServerTest() = withTestApplication(Application::ServerTestConfig) {
         val expected: Array<String> = arrayOf(
             "<server> New user in the chat: $userName",
             "<server> Users online : 1",
@@ -43,7 +39,7 @@ class WebSocketTest {
     }
 
     @Test
-    fun otherUserMessageCallbackTest() = withTestApplication(Application::main) {
+    fun otherUserMessageCallbackTest() = withTestApplication(Application::ServerTestConfig) {
         val expected: Array<String> = arrayOf(
             "<server> New user in the chat: $userName",
             "<server> Users online : 1",

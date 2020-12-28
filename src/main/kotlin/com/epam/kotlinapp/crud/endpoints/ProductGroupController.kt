@@ -1,6 +1,6 @@
 package com.epam.kotlinapp.crud.endpoints
 
-import com.epam.Model
+import com.epam.kotlinapp.Model
 import com.epam.kotlinapp.crud.business.ICommonServices
 import com.epam.kotlinapp.crud.endpoints.roots.*
 import com.epam.kotlinapp.crud.exceptions.DataException

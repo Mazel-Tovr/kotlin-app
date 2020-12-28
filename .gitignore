@@ -4,6 +4,7 @@
 .gradle
 build/
 !src/**/build/
+out
 
 distr
 db
