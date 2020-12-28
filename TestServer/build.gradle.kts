@@ -13,6 +13,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.slf4j:slf4j-api:1.7.30")
+
 }
 
 
@@ -22,8 +24,8 @@ val register = tasks.register("startServer", CustomTask::class) {
 }
 
 
-tasks.register("stopServer"){
-    println("I should stop server but i'm int implemented what a disaster, isn't it ?")
+tasks.register("stopServer") {
+    //TODO And implementation
 }
 
 open class CustomTask : JavaExec() {

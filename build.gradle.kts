@@ -1,24 +1,17 @@
-import kotlinx.coroutines.*
 import org.jetbrains.kotlin.gradle.tasks.*
 
 plugins {
 //    kotlin("plugin.serialization")
 
-    kotlin("plugin.serialization") version "1.4.10"
-    kotlin("jvm") version "1.4.10"
-    id("application")
-    id("com.github.johnrengelman.shadow") version "4.0.4"
+    kotlin("plugin.serialization") version "1.3.70"
+    kotlin("jvm") version "1.3.70"
+    application
 
 
 }
 group = "com.epam"
 version = "1.0-SNAPSHOT"
 
-tasks {
-    build {
-        dependsOn(shadowJar)
-    }
-}
 
 repositories {
     mavenCentral()

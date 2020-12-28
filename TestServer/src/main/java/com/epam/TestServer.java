@@ -11,7 +11,7 @@ public class TestServer {
     private HttpServer httpServer;
 
     public void startServer() throws IOException {
-        httpServer = HttpServer.create(new InetSocketAddress("localhost",0), 0);
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
 
         httpServer.createContext("/test", httpExchange -> {
             String response = "This is the response";
