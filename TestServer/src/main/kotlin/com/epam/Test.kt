@@ -42,7 +42,7 @@ object LocalServer {
         println("Server host ${httpServer.address} ")
     }
 
-     fun close() {
+    fun close() {
         println("I am closed")
         httpServer.stop(1)
     }
